@@ -29,7 +29,7 @@ async function getLatestMembers(): Promise<IMember[]> {
 
 function MemberCard({ member }: { member: IMember }) {
   return (
-    <div className="rounded-lg border border-slate-200 bg-white px-5 py-4">
+    <div className="min-w-0 overflow-hidden rounded-lg border border-slate-200 bg-white px-5 py-4">
       <p className="font-medium text-slate-900">{member.name}</p>
       <p className="mt-0.5 text-sm text-slate-500">{member.area}</p>
     </div>
@@ -40,8 +40,8 @@ export default async function MembersPreviewSection() {
   const members = await getLatestMembers();
 
   return (
-    <section className="bg-white py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section className="overflow-hidden bg-white py-16 lg:py-24">
+      <div className="mx-auto max-w-6xl px-6 sm:px-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
             Community Members
@@ -53,7 +53,7 @@ export default async function MembersPreviewSection() {
 
         {members.length > 0 ? (
           <>
-            <div className="mt-10 grid gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+            <div className="mt-10 grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
               {members.map((member) => (
                 <MemberCard key={member._id} member={member} />
               ))}
@@ -62,7 +62,7 @@ export default async function MembersPreviewSection() {
             <div className="mt-8 text-center">
               <Link
                 href="/members"
-                className="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
               >
                 View All Members
                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

@@ -18,8 +18,8 @@ export default async function Footer() {
   const leaderName = await getLeaderName();
 
   return (
-    <footer className="bg-slate-900 py-20 text-slate-300">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <footer id="contact" className="overflow-hidden bg-slate-900 py-16 text-slate-300 lg:py-24">
+      <div className="mx-auto max-w-6xl px-6 sm:px-6">
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
           {/* Leader & Mission */}
           <div className="lg:col-span-2">
@@ -79,7 +79,7 @@ export default async function Footer() {
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg bg-slate-800 p-2.5 text-slate-400 transition hover:bg-slate-700 hover:text-white"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-slate-800 p-3 text-slate-400 transition hover:bg-slate-700 hover:text-white"
                 aria-label="Facebook"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -90,7 +90,7 @@ export default async function Footer() {
                 href="https://twitter.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg bg-slate-800 p-2.5 text-slate-400 transition hover:bg-slate-700 hover:text-white"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-slate-800 p-3 text-slate-400 transition hover:bg-slate-700 hover:text-white"
                 aria-label="Twitter"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
@@ -101,7 +101,7 @@ export default async function Footer() {
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="rounded-lg bg-slate-800 p-2.5 text-slate-400 transition hover:bg-slate-700 hover:text-white"
+                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-slate-800 p-3 text-slate-400 transition hover:bg-slate-700 hover:text-white"
                 aria-label="Instagram"
               >
                 <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">

@@ -71,10 +71,10 @@ export default function JoinForm() {
   }
 
   const inputClass =
-    "mt-1.5 block w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/20 disabled:cursor-not-allowed disabled:opacity-60";
+    "mt-2 block w-full min-w-0 rounded-lg border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-400 focus:border-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/20 disabled:cursor-not-allowed disabled:opacity-60";
 
   return (
-    <form onSubmit={handleSubmit} noValidate aria-busy={loading} className="space-y-5">
+    <form onSubmit={handleSubmit} noValidate aria-busy={loading} className="min-w-0 space-y-5">
       <div>
         <label htmlFor="join-name" className="block text-sm font-medium text-slate-700">
           Full name <span className="text-red-500">*</span>
@@ -136,7 +136,7 @@ export default function JoinForm() {
         type="submit"
         disabled={loading}
         aria-disabled={loading}
-        className="flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:py-4"
+        className="flex w-full min-w-0 items-center justify-center gap-2 rounded-lg bg-slate-900 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:py-4"
       >
         {loading && <Spinner />}
         {loading ? "Submitting…" : "Join the club"}

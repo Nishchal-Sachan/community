@@ -23,7 +23,7 @@ export function getCookieOptions(maxAge: number = COOKIE_MAX_AGE): Partial<Respo
   return {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
+    sameSite: "lax", // "lax" allows cookie on redirect; "strict" can block it
     path: "/",
     maxAge,
   };

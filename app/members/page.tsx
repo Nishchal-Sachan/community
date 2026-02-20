@@ -41,7 +41,7 @@ function MemberCard({ member }: { member: Member }) {
   });
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white px-5 py-4">
+    <div className="min-w-0 overflow-hidden rounded-lg border border-slate-200 bg-white px-5 py-4">
       <p className="font-medium text-slate-900">{member.name}</p>
       <p className="mt-0.5 text-sm text-slate-500">{member.area}</p>
       <p className="mt-1 text-xs text-slate-400">Joined {joined}</p>
@@ -70,7 +70,7 @@ async function MembersList({ page }: { page: number }) {
         <p className="text-slate-600">No members yet. Be the first to join.</p>
         <Link
           href="/#join-community"
-          className="mt-4 inline-block rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          className="mt-4 inline-flex min-h-[44px] items-center rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
         >
           Join our community
         </Link>
@@ -89,7 +89,7 @@ async function MembersList({ page }: { page: number }) {
         of <span className="font-medium text-slate-700">{pagination.total}</span> members
       </p>
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {members.map((member) => (
           <MemberCard key={member._id} member={member} />
         ))}
@@ -116,16 +116,16 @@ export default async function MembersPage({
   const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
 
   return (
-    <main className="min-h-screen bg-slate-50 px-6 py-12">
+    <main className="min-h-screen overflow-x-hidden bg-slate-50 px-6 py-12">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-10 flex items-center justify-between">
+        <div className="mb-10 flex min-w-0 flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Community Members</h1>
+            <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Community Members</h1>
             <p className="mt-1 text-sm text-slate-500">People who have joined our community</p>
           </div>
           <Link
             href="/#join-community"
-            className="rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+            className="flex min-h-[44px] items-center rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             Join now
           </Link>
@@ -134,7 +134,7 @@ export default async function MembersPage({
         <Suspense
           key={page}
           fallback={
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 12 }).map((_, i) => (
                 <div key={i} className="h-20 animate-pulse rounded-lg bg-slate-200" />
               ))}

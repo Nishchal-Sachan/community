@@ -1,35 +1,30 @@
 import Link from "next/link";
-import { connectDB } from "@/lib/db";
-import { getSiteSettings } from "@/lib/models/SiteSettings";
 
-const FALLBACK_TITLE = "Sarah Martinez";
-const FALLBACK_HERO_IMAGE =
-  "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=80";
-
-async function loadSettings(): Promise<{
-  heroTitle: string;
-  heroImage: string;
-}> {
-  try {
-    await connectDB();
-    const settings = await getSiteSettings();
-    return { heroTitle: settings.heroTitle, heroImage: settings.heroImage };
-  } catch {
-    return { heroTitle: FALLBACK_TITLE, heroImage: FALLBACK_HERO_IMAGE };
-  }
+interface HeroSectionProps {
+  hero: {
+    title: string;
+    subtitle: string;
+    ctaText: string;
+    backgroundImage: string;
+  };
 }
 
-export default async function HeroSection() {
-  const { heroTitle, heroImage } = await loadSettings();
-  const bgImage = heroImage.trim() || FALLBACK_HERO_IMAGE;
+const FALLBACK_BG =
+  "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=80";
+
+export default function HeroSection({ hero }: HeroSectionProps) {
+  const title = hero?.title?.trim() || "Community Leader";
+  const subtitle = hero?.subtitle?.trim() || "Serving the Community with Integrity and Vision";
+  const ctaText = hero?.ctaText?.trim() || "Join Community";
+  const backgroundImage = hero?.backgroundImage?.trim() || FALLBACK_BG;
 
   return (
-    <section className="relative flex min-h-screen items-center justify-center overflow-hidden">
+    <section className="relative flex min-h-[85vh] items-center justify-center overflow-hidden sm:min-h-[90vh] lg:min-h-screen">
       {/* Background image */}
       <div className="absolute inset-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src={bgImage}
+          src={backgroundImage}
           alt=""
           aria-hidden="true"
           className="h-full w-full object-cover"
@@ -42,35 +37,35 @@ export default async function HeroSection() {
       </div>
 
       {/* Centered content */}
-      <div className="relative mx-auto w-full max-w-4xl px-4 py-20 text-center sm:px-6">
+      <div className="relative mx-auto w-full max-w-4xl px-6 py-16 text-center sm:py-20 md:px-8">
         {/* Leader name */}
-        <h1 className="animate-hero-fade-in text-4xl font-bold tracking-tight text-white drop-shadow-lg sm:text-5xl lg:text-6xl">
-          {heroTitle}
+        <h1 className="animate-hero-fade-in break-words text-3xl font-bold tracking-tight text-white drop-shadow-lg md:text-4xl lg:text-6xl">
+          {title}
         </h1>
 
         {/* Tagline */}
-        <p className="animate-hero-fade-in-delay-1 mx-auto mt-5 max-w-2xl text-lg font-medium text-slate-200 drop-shadow-md sm:mt-6 sm:text-xl lg:text-2xl">
-          Serving the Community with Integrity and Vision
+        <p className="animate-hero-fade-in-delay-1 mx-auto mt-4 max-w-2xl break-words text-base font-medium text-slate-200 drop-shadow-md sm:mt-5 md:mt-6 md:text-lg lg:text-2xl">
+          {subtitle}
         </p>
 
         {/* 2-line description */}
-        <p className="animate-hero-fade-in-delay-2 mx-auto mt-5 max-w-xl text-base leading-relaxed text-slate-300 sm:mt-6 sm:text-lg">
+        <p className="animate-hero-fade-in-delay-2 mx-auto mt-4 max-w-xl break-words text-sm leading-relaxed text-slate-300 sm:mt-5 md:mt-6 md:text-base lg:text-lg">
           Committed to fostering local development and ensuring every resident has a voice.
           <br />
           Together we build a neighborhood that works for everyone.
         </p>
 
-        {/* CTAs */}
-        <div className="animate-hero-fade-in-delay-3 mt-10 flex flex-col items-center justify-center gap-4 sm:mt-12 sm:flex-row">
+        {/* CTAs - stacked on mobile, full-width buttons */}
+        <div className="animate-hero-fade-in-delay-3 mt-8 flex w-full max-w-sm flex-col items-center justify-center gap-3 sm:mt-10 sm:max-w-none sm:flex-row sm:gap-4">
           <Link
             href="#join-community"
-            className="inline-flex w-full items-center justify-center rounded-lg bg-slate-800 px-8 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-slate-700 sm:w-auto"
+            className="inline-flex w-full min-w-0 items-center justify-center rounded-lg bg-slate-800 px-8 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-slate-700 sm:w-auto"
           >
-            Join Community
+            {ctaText}
           </Link>
           <Link
             href="#upcoming-events"
-            className="inline-flex w-full items-center justify-center rounded-lg border-2 border-white px-8 py-4 text-base font-semibold text-white transition hover:bg-white/10 sm:w-auto"
+            className="inline-flex w-full min-w-0 items-center justify-center rounded-lg border-2 border-white px-8 py-4 text-base font-semibold text-white transition hover:bg-white/10 sm:w-auto"
           >
             View Events
           </Link>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import AddEventForm from "./AddEventForm";
+import EditEventForm from "./EditEventForm";
 
 interface IEvent {
   _id: string;
@@ -16,6 +17,7 @@ export default function AdminEventList() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const fetchEvents = useCallback(async () => {
     setLoading(true);
@@ -97,6 +99,24 @@ export default function AdminEventList() {
         {!loading && !error && events.length > 0 && (
           <div className="space-y-3">
             {events.map((event) => {
+              if (editingId === event._id) {
+                return (
+                  <div
+                    key={event._id}
+                    className="rounded-xl border border-blue-200 bg-blue-50/30 p-4"
+                  >
+                    <EditEventForm
+                      event={event}
+                      onSuccess={() => {
+                        setEditingId(null);
+                        fetchEvents();
+                      }}
+                      onCancel={() => setEditingId(null)}
+                    />
+                  </div>
+                );
+              }
+
               const formattedDate = new Date(event.date).toLocaleString("en-US", {
                 dateStyle: "medium",
                 timeStyle: "short",
@@ -125,13 +145,22 @@ export default function AdminEventList() {
                     <p className="mt-1 line-clamp-1 text-xs text-gray-400">{event.description}</p>
                   </div>
 
-                  <button
-                    onClick={() => handleDelete(event._id)}
-                    disabled={deletingId === event._id}
-                    className="shrink-0 rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {deletingId === event._id ? "Deleting…" : "Delete"}
-                  </button>
+                  <div className="flex shrink-0 gap-2">
+                    <button
+                      onClick={() => setEditingId(event._id)}
+                      disabled={!!deletingId}
+                      className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(event._id)}
+                      disabled={deletingId === event._id}
+                      className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {deletingId === event._id ? "Deleting…" : "Delete"}
+                    </button>
+                  </div>
                 </div>
               );
             })}

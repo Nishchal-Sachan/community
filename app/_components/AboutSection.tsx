@@ -1,8 +1,10 @@
-import { connectDB } from "@/lib/db";
-import { getSiteSettings } from "@/lib/models/SiteSettings";
-
-const LEADER_IMAGE =
-  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=750&fit=crop";
+interface AboutSectionProps {
+  about: {
+    bio: string;
+    leaderImage: string;
+  };
+  leaderName: string;
+}
 
 const HIGHLIGHTS = [
   {
@@ -37,66 +39,66 @@ const HIGHLIGHTS = [
   },
 ];
 
-async function getLeaderName(): Promise<string> {
-  try {
-    await connectDB();
-    const settings = await getSiteSettings();
-    return settings.heroTitle;
-  } catch {
-    return "Community Leader";
-  }
-}
+const FALLBACK_BIO =
+  "For over twelve years, I have had the privilege of serving our community—first as a school board member, then as a city council representative. My work has centered on education reform, infrastructure upgrades, and youth empowerment programs that give every child a fair start. I believe that strong schools, safe streets, and well-maintained public spaces are the foundation of a thriving neighborhood.\n\nTransparency and accountability are non-negotiable. Every decision I make is informed by resident input, public data, and a commitment to doing what is right for the long term—not just what is convenient. I invite you to hold me to that standard.";
 
-export default async function AboutSection() {
-  const leaderName = await getLeaderName();
+const FALLBACK_IMAGE =
+  "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=750&fit=crop";
+
+export default function AboutSection({ about, leaderName }: AboutSectionProps) {
+  const bio = about?.bio?.trim() || FALLBACK_BIO;
+  const leaderImage = about?.leaderImage?.trim() || FALLBACK_IMAGE;
+  const name = leaderName?.trim() || "Community Leader";
+  const paragraphs = bio.split(/\n\n+/).filter(Boolean);
 
   return (
-    <section id="about" className="bg-gray-50 py-28">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        {/* First row: image left, text right */}
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          {/* Image */}
+    <section id="about" className="overflow-hidden bg-gray-50 py-16 lg:py-24">
+      <div className="mx-auto max-w-6xl px-6 sm:px-6 lg:px-8">
+        {/* First row: image above text on mobile, side-by-side on desktop */}
+        <div className="grid items-center gap-12 sm:gap-14 lg:grid-cols-2 lg:gap-16">
+          {/* Image - first on mobile */}
           <div className="relative aspect-[5/6] overflow-hidden rounded-2xl bg-gray-100 shadow-xl">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={LEADER_IMAGE}
-              alt={`${leaderName} portrait`}
+              src={leaderImage}
+              alt={`${name} portrait`}
               className="h-full w-full object-cover"
             />
           </div>
 
-          {/* Text */}
+          {/* Text - second on mobile */}
           <div className="flex flex-col justify-center">
             <div className="mb-6 h-1 w-12 rounded-full bg-blue-900" />
-            <h2 className="text-4xl font-bold tracking-tight text-slate-900">
-              About {leaderName}
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+              About {name}
             </h2>
 
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-slate-600">
-              For over twelve years, I have had the privilege of serving our community—first as a
-              school board member, then as a city council representative. My work has centered on
-              education reform, infrastructure upgrades, and youth empowerment programs that give
-              every child a fair start. I believe that strong schools, safe streets, and
-              well-maintained public spaces are the foundation of a thriving neighborhood.
-            </p>
-            <p className="mt-4 max-w-xl text-lg leading-relaxed text-slate-600">
-              Transparency and accountability are non-negotiable. Every decision I make is
-              informed by resident input, public data, and a commitment to doing what is right
-              for the long term—not just what is convenient. I invite you to hold me to that
-              standard.
-            </p>
+            {paragraphs.length > 0 ? (
+              paragraphs.map((p, i) => (
+                <p
+                  key={i}
+                  className={i === 0 ? "mt-6 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg" : "mt-4 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg"}
+                >
+                  {p}
+                </p>
+              ))
+            ) : (
+              <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-600 sm:text-lg">
+                {bio}
+              </p>
+            )}
           </div>
         </div>
 
-        {/* Second row: 3 cards (separate from content above) */}
-        <div className="mt-20 grid grid-cols-1 gap-8 sm:grid-cols-3">
+        {/* Second row: cards - stacked on mobile, 3 columns on desktop */}
+        <div className="mt-16 grid grid-cols-1 gap-6 sm:mt-20 sm:grid-cols-3 sm:gap-8">
           {HIGHLIGHTS.map((item) => (
             <div
               key={item.title}
-              className="flex flex-col rounded-2xl bg-white p-8 shadow-md transition hover:shadow-xl"
+              className="flex min-w-0 flex-col overflow-hidden rounded-2xl bg-white p-6 shadow-md transition hover:shadow-xl sm:p-8"
             >
               <div className="flex justify-center">
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 text-slate-700">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-gray-100 text-slate-700">
                   {item.icon}
                 </div>
               </div>

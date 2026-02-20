@@ -21,22 +21,37 @@ export async function POST(req: NextRequest) {
 
     if (!rl.allowed) {
       const minutes = Math.ceil(rl.retryAfter / 60);
+      const errMsg = `Too many login attempts. Try again in ${minutes} minute${minutes !== 1 ? "s" : ""}.`;
+      const isForm = (req.headers.get("content-type") ?? "").includes("application/x-www-form-urlencoded");
+      if (isForm) {
+        const loginUrl = new URL("/admin/login", req.url);
+        loginUrl.searchParams.set("error", errMsg);
+        return NextResponse.redirect(loginUrl, { status: 302 });
+      }
       return NextResponse.json(
-        {
-          error: `Too many login attempts. Try again in ${minutes} minute${minutes !== 1 ? "s" : ""}.`,
-        },
-        {
-          status: 429,
-          headers: { "Retry-After": String(rl.retryAfter) },
-        }
+        { error: errMsg },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
       );
     }
 
-    // ── Parse body ─────────────────────────────────────────────────────────
-    const body = await parseBody(req);
-    if (!body) throw new ApiError(400, "Invalid JSON body");
+    // ── Parse body (JSON or form) ──────────────────────────────────────────
+    const contentType = req.headers.get("content-type") ?? "";
+    let email: string;
+    let password: string;
+    let redirectTo: string | null = null;
 
-    const { email, password } = body;
+    if (contentType.includes("application/x-www-form-urlencoded")) {
+      const formData = await req.formData();
+      email = (formData.get("email") as string) ?? "";
+      password = (formData.get("password") as string) ?? "";
+      redirectTo = (formData.get("redirect") as string) || null;
+    } else {
+      const body = await parseBody(req);
+      if (!body) throw new ApiError(400, "Invalid JSON body");
+      email = (body.email as string) ?? "";
+      password = (body.password as string) ?? "";
+      redirectTo = (body.redirect as string) || req.headers.get("x-login-redirect");
+    }
 
     // ── Validate fields ────────────────────────────────────────────────────
     if (!email || typeof email !== "string" || !email.trim()) {
@@ -67,14 +82,24 @@ export async function POST(req: NextRequest) {
       throw new ApiError(401, "Invalid credentials");
     }
 
-    // ── Issue JWT cookie ───────────────────────────────────────────────────
+    // ── Issue JWT cookie and redirect ───────────────────────────────────────
     const token = signToken({ adminId: admin._id.toString(), email: admin.email });
 
-    const response = NextResponse.json({ message: "Login successful" }, { status: 200 });
+    const target = redirectTo ?? "/admin/dashboard";
+    const safeRedirect = target.startsWith("/") && !target.startsWith("//") ? target : "/admin/dashboard";
+
+    const response = NextResponse.redirect(new URL(safeRedirect, req.url), { status: 302 });
     response.cookies.set(COOKIE_NAME, token, getCookieOptions());
+    response.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
 
     return response;
   } catch (error) {
+    const isForm = (req.headers.get("content-type") ?? "").includes("application/x-www-form-urlencoded");
+    if (isForm && error instanceof ApiError) {
+      const loginUrl = new URL("/admin/login", req.url);
+      loginUrl.searchParams.set("error", error.message);
+      return NextResponse.redirect(loginUrl, { status: 302 });
+    }
     return handleApiError(error, "POST /api/auth/login");
   }
 }

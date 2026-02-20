@@ -39,13 +39,13 @@ function EventCard({ event }: { event: IEvent }) {
   });
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
-      <div className="relative h-48 w-full overflow-hidden bg-slate-100">
+    <div className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-100">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={event.imageUrl}
           alt={event.title}
-          className="h-full w-full object-cover"
+          className="h-full w-full object-cover object-center"
         />
       </div>
       <div className="flex flex-1 flex-col p-5 sm:p-6">
@@ -61,7 +61,7 @@ function EventCard({ event }: { event: IEvent }) {
         </p>
         <button
           type="button"
-          className="mt-4 w-fit rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          className="mt-4 min-h-[44px] min-w-[44px] w-fit rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
         >
           Learn More
         </button>
@@ -84,8 +84,8 @@ export default async function EventsSection() {
   const events = await getUpcomingEvents();
 
   return (
-    <section id="upcoming-events" className="bg-white py-20">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
+    <section id="upcoming-events" className="overflow-hidden bg-white py-16 lg:py-24">
+      <div className="mx-auto max-w-6xl px-6 sm:px-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
             Upcoming Events
@@ -96,7 +96,7 @@ export default async function EventsSection() {
         </div>
 
         {events.length > 0 ? (
-          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+          <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => (
               <EventCard key={event._id} event={event} />
             ))}

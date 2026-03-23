@@ -12,23 +12,16 @@ interface HeroSectionProps {
 const FALLBACK_BG =
   "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=80";
 
-const DEFAULT_TITLE = "Koi Sataye,\nHume Bataye";
-
-const DEFAULT_SUBTITLE = "Standing as a shield for justice and support";
-
-const OVERLAY_GRADIENT =
-  "linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0.1) 100%)";
+const DEFAULT_SUBTITLE = "शिक्षा, स्वास्थ्य और सम्मान — कुशवाहा समाज बने महान";
 
 export default function HeroSection({ hero }: HeroSectionProps) {
-  const titleRaw = hero?.title?.trim();
-  const titleDisplay = titleRaw || DEFAULT_TITLE;
   const subtitle = hero?.subtitle?.trim() || DEFAULT_SUBTITLE;
-  const ctaText = hero?.ctaText?.trim() || "Join ABKM";
+  const ctaText = hero?.ctaText?.trim() || "Join Community";
   const backgroundImage = hero?.backgroundImage?.trim() || FALLBACK_BG;
 
   return (
     <section
-      className="relative h-[100vh] w-full overflow-hidden"
+      className="relative h-screen w-full overflow-hidden"
       aria-labelledby="hero-title"
     >
       {/* Background — z-0 */}
@@ -45,27 +38,30 @@ export default function HeroSection({ hero }: HeroSectionProps) {
 
       {/* Overlay — z-1 */}
       <div
-        className="absolute inset-0 z-[1] h-full w-full"
-        style={{ background: OVERLAY_GRADIENT }}
+        className="absolute inset-0 z-1 h-full w-full bg-[linear-gradient(to_right,rgba(0,0,0,0.75)_0%,rgba(0,0,0,0.55)_40%,rgba(0,0,0,0.2)_70%,rgba(0,0,0,0.05)_100%)]"
         aria-hidden="true"
       />
 
-      {/* Content — z-2, left-aligned only */}
-      <div className="relative z-[2] mx-auto flex h-full max-w-[1200px] items-center pl-[80px] pr-6 max-sm:pl-6">
-        <div className="max-w-[600px] text-left">
+      {/* Content — z-2, vertically centered, max-width 1200px */}
+      <div className="relative z-2 mx-auto flex h-full max-w-300 items-center px-5 pl-5 sm:pl-20 sm:pr-6 max-sm:justify-center max-sm:text-center">
+        <div className="max-w-150 text-left max-sm:mx-auto max-sm:text-center">
           <h1
             id="hero-title"
-            className="mb-4 whitespace-pre-line break-words font-heading text-4xl font-extrabold leading-[1.1] text-white sm:text-5xl md:text-6xl lg:text-[72px]"
+            className="max-w-150 font-heading font-bold leading-[1.1] text-white max-sm:text-[32px] sm:text-[56px] md:text-[60px] lg:text-[64px]"
           >
-            {titleDisplay}
+            <span>Akhil Bhartiya</span>
+            <br className="max-sm:hidden" />
+            <span>Kushwaha Mahasabha</span>
           </h1>
 
-          <p className="mb-6 font-body text-[18px] font-normal leading-normal text-[#d1d5db]">
+          <p
+            className="mt-5 max-w-150 font-body text-base font-normal leading-[1.6] text-white/90 tracking-[0.3px] sm:text-[18px] md:text-[20px] max-sm:mx-auto max-sm:text-center"
+          >
             {subtitle}
           </p>
 
           <JoinLink
-            className="inline-flex items-center justify-center rounded-[6px] bg-[#F57C00] px-7 py-3 font-body font-medium text-white transition-colors hover:bg-[#E65100] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
+            className="mt-7 inline-flex items-center justify-center rounded-md bg-[#F57C00] px-7 py-3 font-body font-medium text-white transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#E65100] hover:shadow-[0_6px_20px_rgba(245,124,0,0.3)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
           >
             {ctaText}
           </JoinLink>

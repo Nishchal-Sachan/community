@@ -68,6 +68,7 @@ export default function FullWidthCTASection() {
           }`}
         >
           {/* Background image */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={slide.image}
             alt=""

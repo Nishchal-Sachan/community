@@ -3,13 +3,7 @@ import type { LucideIcon } from "lucide-react";
 import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 
 const ABOUT =
-  "Akhil Bhartiya Kushwaha Mahasabha (ABKM) is a national organisation devoted to member empowerment, community representation, and coordinated action across states—linking rural constituencies with urban networks for shared progress.";
-
-const MEMBERSHIP_ITEMS = [
-  "General Membership",
-  "Executive Membership",
-  "Corporate Membership",
-] as const;
+  "अखिल भारतीय कुशवाहा महासभा एक सामाजिक संगठन है, जो शिक्षा, स्वास्थ्य और सम्मान के माध्यम से समाज के सर्वांगीण विकास के लिए कार्यरत है। हमारा उद्देश्य समाज के हर वर्ग को जोड़कर उन्हें सशक्त, जागरूक और आत्मनिर्भर बनाना है।";
 
 const SOCIAL_LINKS = [
   { label: "Facebook", href: "https://facebook.com", Icon: Facebook },
@@ -70,7 +64,7 @@ export default function Footer() {
 
       {/* Section 2: Main Footer */}
       <div className="px-6 py-[80px] sm:px-[60px]">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-[60px] md:grid-cols-2 xl:grid-cols-4">
+        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-10 md:grid-cols-3">
           {/* Column 1: About */}
           <div className="min-w-0">
             <h3 className="mb-4 font-heading text-[18px] font-semibold text-white">
@@ -87,59 +81,38 @@ export default function Footer() {
             </Link>
           </div>
 
-          {/* Column 2: Membership */}
-          <div className="min-w-0">
-            <h3 className="mb-4 font-heading text-[18px] font-semibold text-white">
-              Membership Options
-            </h3>
-            <ul className="flex flex-col gap-3 font-body text-[15px] text-[#94a3b8]">
-              {MEMBERSHIP_ITEMS.map((item) => (
-                <li key={item}>
-                  <Link
-                    href="#membership"
-                    className="transition-colors hover:text-white"
-                  >
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Column 3: Office */}
+          {/* Column 2: Office */}
           <div className="min-w-0">
             <h3 className="mb-4 font-heading text-[18px] font-semibold text-white">
               Our Office
             </h3>
             <address className="flex flex-col gap-3 not-italic">
               <p className="font-body text-[15px] leading-relaxed text-[#94a3b8]">
-                National Secretariat, ABKM
+                Naveen Nagar
                 <br />
-                12-A, Community Bhawan Road
-                <br />
-                Karol Bagh, New Delhi — 110005, India
+                Kakadev, Kanpur Nagar
               </p>
               <a
-                href="mailto:example@abkm.org"
+                href="mailto:contact@kushwahamahasabha.org"
                 className="font-body text-[15px] text-[#94a3b8] transition-colors hover:text-white"
               >
-                Email: example@abkm.org
+                Email: contact@kushwahamahasabha.org
               </a>
               <a
-                href="tel:+919876543210"
+                href="tel:+919839422115"
                 className="font-body text-[15px] text-[#94a3b8] transition-colors hover:text-white"
               >
-                Phone: +91 9876543210
+                Phone: +91 9839422115
               </a>
             </address>
           </div>
 
-          {/* Column 4: Social */}
+          {/* Column 3: Social */}
           <div className="min-w-0">
             <h3 className="mb-4 font-heading text-[18px] font-semibold text-white">
               Social
             </h3>
-            <div className="flex flex-wrap gap-2.5">
+            <div className="flex flex-col items-center gap-4">
               {SOCIAL_LINKS.map(({ label, href, Icon }) => (
                 <SocialIcon key={label} href={href} label={label} Icon={Icon} />
               ))}

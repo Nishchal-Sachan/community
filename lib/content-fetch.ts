@@ -34,8 +34,8 @@ export async function fetchPageContent(): Promise<PageContentData | null> {
 
 export const FALLBACK_CONTENT: PageContentData = {
   hero: {
-    title: "Sarah Martinez",
-    subtitle: "Serving the Community with Integrity and Vision",
+    title: "Akhil Bhartiya Kushwaha Mahasabha",
+    subtitle: "शिक्षा, स्वास्थ्य और सम्मान — कुशवाहा समाज बने महान",
     ctaText: "Join Community",
     backgroundImage:
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=80",

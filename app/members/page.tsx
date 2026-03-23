@@ -1,5 +1,4 @@
 import { Suspense } from "react";
-import Link from "next/link";
 import { JoinLink } from "@/components/JoinLink";
 import PaginationControls from "@/app/_components/PaginationControls";
 import { Container } from "@/components/ui/Container";

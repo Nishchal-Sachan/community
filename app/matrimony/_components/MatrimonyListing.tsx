@@ -100,11 +100,14 @@ export function MatrimonyListing() {
             >
               <div className="aspect-[4/3] w-full bg-gray-100">
                 {profile.profilePhotoUrl ? (
-                  <img
-                    src={profile.profilePhotoUrl}
-                    alt={profile.fullName}
-                    className="h-full w-full object-cover"
-                  />
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={profile.profilePhotoUrl}
+                      alt={profile.fullName}
+                      className="h-full w-full object-cover"
+                    />
+                  </>
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-4xl text-gray-400">
                     {profile.fullName.charAt(0).toUpperCase()}

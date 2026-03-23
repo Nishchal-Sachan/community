@@ -1,11 +1,11 @@
 import { Suspense } from "react";
 import HomeContentSections from "./_components/HomeContentSections";
 import Footer from "./_components/Footer";
+import FullWidthCTASection from "./_components/FullWidthCTASection";
 import LeadershipSection from "./_components/LeadershipSection";
+import LeadershipTeamSection from "./_components/LeadershipTeamSection";
 import OurGoalSection from "./_components/OurGoalSection";
 import OurServicesSection from "./_components/OurServicesSection";
-import PillarsSection from "./_components/PillarsSection";
-import FullWidthCTASection from "./_components/FullWidthCTASection";
 
 function HeroLoadingFallback() {
   return (
@@ -30,11 +30,11 @@ export default function HomePage() {
 
       <LeadershipSection />
 
+      <LeadershipTeamSection />
+
       <OurGoalSection />
 
       <OurServicesSection />
-
-      <PillarsSection />
 
       <FullWidthCTASection />
 

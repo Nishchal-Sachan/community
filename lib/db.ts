@@ -13,7 +13,6 @@ if (!MONGODB_URI) {
  * in Next.js development mode.
  */
 declare global {
-  // eslint-disable-next-line no-var
   var mongoose: { conn: mongoose.Connection | null; promise: Promise<mongoose.Connection> | null };
 }
 

@@ -1,81 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-const TAB_ITEMS = [
-  "Legal & Regulatory Protection",
-  "Financial & Economic Protection",
-  "Protection Against Market Disruptions",
-  "Social & Welfare Protection",
-  "Collective Power and Representation",
-] as const;
-
-type TabId = (typeof TAB_ITEMS)[number];
-
-const TAB_CONTENT: Record<
-  TabId,
-  { title: string; subtitle: string; paragraph: string; image: string }
-> = {
-  "Legal & Regulatory Protection": {
-    title: "Legal & Regulatory Protection",
-    subtitle: "Supporting traders with legal awareness and compliance.",
-    paragraph:
-      "Provide guidance on documentation, filings, and compliance with local and national regulations. Facilitate coordination with legal advisors and promote awareness of rights and protective laws.",
-    image:
-      "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&h=400&fit=crop",
-  },
-  "Financial & Economic Protection": {
-    title: "Financial & Economic Protection",
-    subtitle: "Strengthening traders with stability, access, and resilience.",
-    paragraph:
-      "Help traders access credit, insurance, and financial literacy programs. Provide workshops on budgeting and financial planning to ensure long-term economic stability.",
-    image:
-      "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=800&h=400&fit=crop",
-  },
-  "Protection Against Market Disruptions": {
-    title: "Protection Against Market Disruptions",
-    subtitle: "Safeguarding businesses from external shocks.",
-    paragraph:
-      "Support traders during market disruptions by providing advisory, crisis management strategies, and collective support mechanisms.",
-    image:
-      "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=800&h=400&fit=crop",
-  },
-  "Social & Welfare Protection": {
-    title: "Social & Welfare Protection",
-    subtitle: "Ensuring community well-being and support systems.",
-    paragraph:
-      "Organize health camps, welfare schemes, and emergency support initiatives to ensure community safety and resilience.",
-    image:
-      "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=800&h=400&fit=crop",
-  },
-  "Collective Power and Representation": {
-    title: "Collective Power and Representation",
-    subtitle: "Strengthening voice through unity.",
-    paragraph:
-      "Create a unified platform where traders can raise concerns, influence policies, and ensure fair representation.",
-    image:
-      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=400&fit=crop",
-  },
-};
-
-const DEFAULT_TAB: TabId = "Financial & Economic Protection";
-
-function SidebarIcon({ isActive }: { isActive: boolean }) {
-  return (
-    <svg
-      className={`size-5 shrink-0 ${isActive ? "text-white" : "text-[#F57C00]"}`}
-      fill="currentColor"
-      viewBox="0 0 20 20"
-      aria-hidden
-    >
-      <path
-        fillRule="evenodd"
-        d="M10 1.944A11.954 11.954 0 002.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0010 1.944z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
+import { services } from "@/data/services";
 
 function DividerWithDots() {
   return (
@@ -84,7 +10,7 @@ function DividerWithDots() {
       aria-hidden="true"
     >
       <div className="h-px w-full bg-[#cccccc]" />
-      <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 bg-[#E6D3B3] px-0.5">
+      <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 bg-gradient-to-br from-orange-50 via-white to-orange-100 px-0.5">
         <span className="size-2 shrink-0 rounded-full bg-[#2E7D32]" />
         <span className="size-2 shrink-0 rounded-full bg-[#2E7D32]" />
         <span className="size-2 shrink-0 rounded-full bg-[#2E7D32]" />
@@ -94,16 +20,18 @@ function DividerWithDots() {
 }
 
 export default function OurServicesSection() {
-  const [activeTab, setActiveTab] = useState<TabId>(DEFAULT_TAB);
-  const content = TAB_CONTENT[activeTab];
+  const [activeService, setActiveService] = useState("matrimony");
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const active = services.find((s) => s.id === activeService) ?? services[0];
 
   return (
     <section
       id="services"
-      className="w-full bg-[#E6D3B3] py-[100px]"
+      className="bg-gradient-to-br from-orange-50 via-white to-orange-100 px-6 py-20 lg:px-16"
       aria-labelledby="services-heading"
     >
-      <div className="px-4 sm:px-6">
+      <div className="mx-auto max-w-[1200px]">
         <p className="text-center font-body text-[12px] uppercase tracking-[3px] text-[#F57C00]">
           JOIN WITH US
         </p>
@@ -112,58 +40,132 @@ export default function OurServicesSection() {
           id="services-heading"
           className="mt-[10px] text-center font-heading text-[48px] font-bold leading-tight text-gray-900"
         >
-          Explore Our Services
+          🛠️ हमारी सेवाएं
         </h2>
+
+        <p className="mx-auto mt-5 max-w-[900px] text-center font-body text-[15px] leading-[1.9] text-[#555555]">
+          अखिल भारतीय कुशवाहा महासभा समाज के सर्वांगीण विकास हेतु विभिन्न सेवाएं प्रदान करती है, जिनका उद्देश्य हर वर्ग को सहयोग, अवसर और सशक्तिकरण देना है।
+        </p>
 
         <DividerWithDots />
 
-        <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-10 lg:grid-cols-[350px_1fr] lg:gap-[40px]">
-          {/* Left sidebar */}
-          <nav
-            className="flex flex-col gap-3"
-            aria-label="Service categories"
-          >
-            {TAB_ITEMS.map((item) => (
+        {/* Mobile: Accordion */}
+        <div className="space-y-3 md:hidden">
+          {services.map((service, index) => (
+            <div key={service.id} className="overflow-hidden rounded-xl bg-white shadow-md">
               <button
-                key={item}
                 type="button"
-                onClick={() => setActiveTab(item)}
-                aria-pressed={activeTab === item}
-                aria-current={activeTab === item ? "true" : undefined}
-                className={`flex cursor-pointer items-center gap-3 rounded-md px-4 py-4 text-left font-body text-[14px] font-medium transition-colors ${
-                  activeTab === item
-                    ? "bg-[#F57C00] text-white"
-                    : "bg-[#f5f5f5] text-gray-900 hover:bg-[#ebebeb]"
+                onClick={() =>
+                  setActiveIndex(activeIndex === index ? -1 : index)
+                }
+                className={`flex w-full items-center justify-between rounded-xl px-4 py-4 text-left font-body transition-all duration-300 ${
+                  activeIndex === index
+                    ? "bg-orange-500 text-white"
+                    : "bg-gray-100"
                 }`}
               >
-                <SidebarIcon isActive={activeTab === item} />
-                {item}
+                <span className="flex items-center gap-3 font-medium">
+                  <span className="text-xl" aria-hidden>
+                    {service.icon}
+                  </span>
+                  {service.title}
+                </span>
+                <span className="text-lg font-medium" aria-hidden>
+                  {activeIndex === index ? "−" : "+"}
+                </span>
+              </button>
+              {activeIndex === index && (
+                <div className="rounded-b-xl bg-gray-50 p-4 font-body text-sm text-gray-700 transition-all duration-300">
+                  <p className="mb-3">{service.description}</p>
+                  <ul className="space-y-2">
+                    {service.points.map((point, i) => {
+                      const text = point.replace(/^✔️\s*/, "");
+                      return (
+                        <li key={i} className="flex items-start gap-2">
+                          <span className="mt-0.5 shrink-0 text-green-500">✔</span>
+                          <span>{text}</span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop: Left categories + right content */}
+        <div className="hidden gap-10 md:grid md:grid-cols-2 lg:grid-cols-[320px_1fr]">
+          {/* Left: Rich sidebar */}
+          <div className="h-fit space-y-3 rounded-2xl bg-white p-4 shadow-lg lg:sticky lg:top-24">
+            <div className="mb-4 px-2">
+              <h3 className="font-heading font-semibold text-gray-800">
+                सेवाओं की सूची
+              </h3>
+              <p className="mt-1 text-sm text-gray-500">
+                अपनी आवश्यक सेवा चुनें
+              </p>
+            </div>
+
+            {services.map((service) => (
+              <button
+                key={service.id}
+                type="button"
+                onClick={() => setActiveService(service.id)}
+                className={`flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 font-body transition-all duration-300 ${
+                  activeService === service.id
+                    ? "scale-[1.02] bg-orange-500 text-white shadow-md"
+                    : "bg-gray-50 hover:translate-x-1 hover:bg-orange-50"
+                }`}
+              >
+                <span className="text-xl" aria-hidden>
+                  {service.icon}
+                </span>
+                <span className="font-medium">{service.title}</span>
               </button>
             ))}
-          </nav>
 
-          {/* Right content panel */}
-          <div
-            className="rounded-md bg-white p-8 sm:p-10"
-            role="region"
-            aria-live="polite"
-            aria-label={`Content for ${content.title}`}
-          >
-            <h3 className="mb-2.5 font-heading text-[28px] font-semibold text-gray-900">
-              {content.title}
-            </h3>
-            <div className="h-1 w-10 bg-[#F57C00]" aria-hidden />
-            <p className="mt-2.5 font-body text-[16px] font-semibold text-[#444444]">
-              {content.subtitle}
-            </p>
-            <p className="mt-2.5 font-body text-[15px] leading-[1.8] text-[#555555]">
-              {content.paragraph}
-            </p>
-            <img
-              src={content.image}
-              alt=""
-              className="mt-5 w-full rounded-md object-cover"
-            />
+            <div className="mt-6 rounded-xl bg-orange-50 p-4 text-sm text-gray-700">
+              <p className="font-body">👥 10,000+ सदस्य जुड़े</p>
+              <p className="mt-1 font-body">💼 500+ रोजगार अवसर</p>
+              <p className="mt-1 font-body">🎓 200+ छात्र सहायता</p>
+            </div>
+          </div>
+
+          {/* Right: Dynamic content */}
+          <div className="min-h-[300px]">
+            <div className="rounded-2xl bg-white p-8 shadow-lg transition-all duration-300 hover:shadow-xl">
+              <h2 className="mb-3 font-heading text-2xl font-bold text-gray-800">
+                {active.title}
+              </h2>
+              <p className="mb-6 font-body leading-relaxed text-gray-600">
+                {active.description}
+              </p>
+
+              <div className="mt-6 grid gap-4 sm:grid-cols-2">
+                {active.points.map((point, i) => {
+                  const text = point.replace(/^✔️\s*/, "");
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-start gap-2 font-body text-gray-700"
+                    >
+                      <span className="mt-0.5 shrink-0 text-green-500">✔</span>
+                      <span>{text}</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="mt-8 rounded-xl border border-orange-100 bg-orange-50 p-5">
+                <h4 className="mb-2 font-heading font-semibold text-gray-800">
+                  हमारा उद्देश्य
+                </h4>
+                <p className="font-body text-sm text-gray-600">
+                  हम समाज के प्रत्येक व्यक्ति तक अवसर, सहयोग और सशक्तिकरण पहुँचाने के लिए प्रतिबद्ध हैं।
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

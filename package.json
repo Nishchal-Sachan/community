@@ -6,12 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "seed:admin": "tsx scripts/seed-admin.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cloudinary": "^2.9.0",
+    "framer-motion": "^12.38.0",
     "jose": "^6.1.3",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.577.0",

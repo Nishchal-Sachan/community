@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/user-auth";
-import { handleApiError } from "@/lib/api-error";
 
 const JOIN_FORM_COOKIE = "join_form_data";
 const COOKIE_MAX_AGE = 60 * 15; // 15 minutes

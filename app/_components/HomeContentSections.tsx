@@ -1,10 +1,14 @@
-import { fetchPageContent, FALLBACK_CONTENT } from "@/lib/content-fetch";
 import HeroSection from "./HeroSection";
 
-/** Homepage: hero only. Full `PageContent` still fetched for future use / dashboard. */
-export default async function HomeContentSections() {
-  const content = await fetchPageContent();
-  const data = content ?? FALLBACK_CONTENT;
+/** Static hero content — no longer fetched from admin/DB. */
+const HERO_CONTENT = {
+  title: "Akhil Bhartiya Kushwaha Mahasabha",
+  subtitle: "शिक्षा, स्वास्थ्य और सम्मान — कुशवाहा समाज बने महान",
+  ctaText: "Join Community",
+  backgroundImage:
+    "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=80",
+};
 
-  return <HeroSection hero={data.hero} />;
+export default function HomeContentSections() {
+  return <HeroSection hero={HERO_CONTENT} />;
 }

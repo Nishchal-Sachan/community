@@ -18,6 +18,9 @@
 /build
 *.tsbuildinfo
 
+# uploads (user content)
+/public/uploads
+
 # misc
 .DS_Store
 *.pem

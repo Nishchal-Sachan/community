@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { JoinLink } from "@/components/JoinLink";
 
 interface HeroSectionProps {
   hero: {
@@ -12,63 +12,63 @@ interface HeroSectionProps {
 const FALLBACK_BG =
   "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=80";
 
+const DEFAULT_TITLE = "Koi Sataye,\nHume Bataye";
+
+const DEFAULT_SUBTITLE = "Standing as a shield for justice and support";
+
+const OVERLAY_GRADIENT =
+  "linear-gradient(to right, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 40%, rgba(0,0,0,0.3) 70%, rgba(0,0,0,0.1) 100%)";
+
 export default function HeroSection({ hero }: HeroSectionProps) {
-  const title = hero?.title?.trim() || "Community Leader";
-  const subtitle = hero?.subtitle?.trim() || "Serving the Community with Integrity and Vision";
-  const ctaText = hero?.ctaText?.trim() || "Join Community";
+  const titleRaw = hero?.title?.trim();
+  const titleDisplay = titleRaw || DEFAULT_TITLE;
+  const subtitle = hero?.subtitle?.trim() || DEFAULT_SUBTITLE;
+  const ctaText = hero?.ctaText?.trim() || "Join ABKM";
   const backgroundImage = hero?.backgroundImage?.trim() || FALLBACK_BG;
 
   return (
-    <section className="relative flex min-h-[85vh] items-center justify-center overflow-hidden sm:min-h-[90vh] lg:min-h-screen">
-      {/* Background image */}
-      <div className="absolute inset-0">
+    <section
+      className="relative h-[100vh] w-full overflow-hidden"
+      aria-labelledby="hero-title"
+    >
+      {/* Background — z-0 */}
+      <div className="absolute inset-0 z-0 h-full w-full">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={backgroundImage}
           alt=""
           aria-hidden="true"
           className="h-full w-full object-cover"
-        />
-        {/* Dark gradient overlay */}
-        <div
-          className="absolute inset-0 bg-gradient-to-b from-slate-900/70 via-slate-900/60 to-slate-900/80"
-          aria-hidden="true"
+          fetchPriority="high"
         />
       </div>
 
-      {/* Centered content */}
-      <div className="relative mx-auto w-full max-w-4xl px-6 py-16 text-center sm:py-20 md:px-8">
-        {/* Leader name */}
-        <h1 className="animate-hero-fade-in break-words text-3xl font-bold tracking-tight text-white drop-shadow-lg md:text-4xl lg:text-6xl">
-          {title}
-        </h1>
+      {/* Overlay — z-1 */}
+      <div
+        className="absolute inset-0 z-[1] h-full w-full"
+        style={{ background: OVERLAY_GRADIENT }}
+        aria-hidden="true"
+      />
 
-        {/* Tagline */}
-        <p className="animate-hero-fade-in-delay-1 mx-auto mt-4 max-w-2xl break-words text-base font-medium text-slate-200 drop-shadow-md sm:mt-5 md:mt-6 md:text-lg lg:text-2xl">
-          {subtitle}
-        </p>
+      {/* Content — z-2, left-aligned only */}
+      <div className="relative z-[2] mx-auto flex h-full max-w-[1200px] items-center pl-[80px] pr-6 max-sm:pl-6">
+        <div className="max-w-[600px] text-left">
+          <h1
+            id="hero-title"
+            className="mb-4 whitespace-pre-line break-words font-heading text-4xl font-extrabold leading-[1.1] text-white sm:text-5xl md:text-6xl lg:text-[72px]"
+          >
+            {titleDisplay}
+          </h1>
 
-        {/* 2-line description */}
-        <p className="animate-hero-fade-in-delay-2 mx-auto mt-4 max-w-xl break-words text-sm leading-relaxed text-slate-300 sm:mt-5 md:mt-6 md:text-base lg:text-lg">
-          Committed to fostering local development and ensuring every resident has a voice.
-          <br />
-          Together we build a neighborhood that works for everyone.
-        </p>
+          <p className="mb-6 font-body text-[18px] font-normal leading-normal text-[#d1d5db]">
+            {subtitle}
+          </p>
 
-        {/* CTAs - stacked on mobile, full-width buttons */}
-        <div className="animate-hero-fade-in-delay-3 mt-8 flex w-full max-w-sm flex-col items-center justify-center gap-3 sm:mt-10 sm:max-w-none sm:flex-row sm:gap-4">
-          <Link
-            href="#join-community"
-            className="inline-flex w-full min-w-0 items-center justify-center rounded-lg bg-slate-800 px-8 py-4 text-base font-semibold text-white shadow-lg transition hover:bg-slate-700 sm:w-auto"
+          <JoinLink
+            className="inline-flex items-center justify-center rounded-[6px] bg-[#F57C00] px-7 py-3 font-body font-medium text-white transition-colors hover:bg-[#E65100] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/40"
           >
             {ctaText}
-          </Link>
-          <Link
-            href="#upcoming-events"
-            className="inline-flex w-full min-w-0 items-center justify-center rounded-lg border-2 border-white px-8 py-4 text-base font-semibold text-white transition hover:bg-white/10 sm:w-auto"
-          >
-            View Events
-          </Link>
+          </JoinLink>
         </div>
       </div>
     </section>

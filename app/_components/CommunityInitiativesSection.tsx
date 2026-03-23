@@ -1,4 +1,6 @@
 import { getInitiativeIcon } from "@/lib/icon-map";
+import { Container } from "@/components/ui/Container";
+import { Section } from "@/components/sections/Section";
 
 interface Initiative {
   title: string;
@@ -25,36 +27,29 @@ export default function CommunityInitiativesSection({
     : FALLBACK_INITIATIVES;
 
   return (
-    <section id="initiatives" className="overflow-hidden bg-slate-50 py-16 lg:py-24">
-      <div className="mx-auto max-w-6xl px-6 sm:px-6">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-            Building a Stronger Community Together
+    <Section id="programs" className="bg-gray-50">
+      <Container>
+        <div className="flex flex-col gap-8">
+          <h2 className="text-center font-heading text-4xl font-extrabold tracking-tight text-gray-900">
+            Programs
           </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-base text-slate-600 sm:text-lg">
-            Focused efforts to improve the quality of life for everyone in our neighborhood.
-          </p>
-        </div>
 
-        <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-          {items.map((item) => (
-            <div
-              key={item.title}
-              className="flex min-w-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md"
-            >
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white sm:h-14 sm:w-14 [&>svg]:h-full [&>svg]:max-h-full [&>svg]:w-full [&>svg]:max-w-full">
-                {getInitiativeIcon(item.icon)}
-              </div>
-              <h3 className="mt-5 break-words text-base font-semibold text-slate-900 sm:mt-6 sm:text-lg">
-                {item.title}
-              </h3>
-              <p className="mt-2 break-words text-sm leading-relaxed text-slate-600 sm:mt-3">
-                {item.description}
-              </p>
-            </div>
-          ))}
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+            {items.map((item) => (
+              <article
+                key={item.title}
+                className="text-left rounded-lg border border-gray-200 bg-white p-6 transition-[border-color,box-shadow] duration-200 ease-out hover:border-primary hover:shadow-md"
+              >
+                <div className="flex size-12 shrink-0 items-center justify-center rounded-md bg-primary text-white [&_svg]:h-6 [&_svg]:w-6">
+                  {getInitiativeIcon(item.icon)}
+                </div>
+                <h3 className="mt-4 font-heading text-base font-semibold text-gray-900">{item.title}</h3>
+                <p className="mt-2 font-body text-sm text-gray-600">{item.description}</p>
+              </article>
+            ))}
+          </div>
         </div>
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }

@@ -1,24 +1,24 @@
 import JoinForm from "./JoinForm";
+import { Container } from "@/components/ui/Container";
+import { Section } from "@/components/sections/Section";
 
 export default function JoinSection() {
   return (
-    <section id="join-community" className="overflow-hidden bg-slate-50 py-16 lg:py-24">
-      <div className="mx-auto max-w-6xl px-6 sm:px-6">
-        <div className="mx-auto min-w-0 max-w-xl rounded-xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8 md:p-10">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl lg:text-4xl">
-              Join Our Community
-            </h2>
-            <p className="mx-auto mt-4 max-w-lg text-base text-slate-600 sm:text-lg">
-              Be part of something bigger. Add your name to our growing network of neighbors
-              committed to making our community stronger.
-            </p>
-          </div>
-          <div className="mt-8">
+    <Section id="join-community" className="bg-gray-50">
+      <Container>
+        <div className="mx-auto max-w-xl">
+          <div className="section-stack rounded-xl border border-gray-200 bg-white p-6 sm:p-8 md:p-10">
+            <div className="flex flex-col items-center gap-3 text-center">
+              <h2 className="type-h2">Join Our Community</h2>
+              <p className="type-body max-w-lg">
+                Be part of something bigger. Add your name to our growing network of neighbors
+                committed to making our community stronger.
+              </p>
+            </div>
             <JoinForm />
           </div>
         </div>
-      </div>
-    </section>
+      </Container>
+    </Section>
   );
 }

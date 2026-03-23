@@ -1,16 +1,4 @@
-async function getBaseUrl(): Promise<string> {
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
-  try {
-    const { headers } = await import("next/headers");
-    const h = await headers();
-    const host = h.get("host") || "localhost:3000";
-    const proto = h.get("x-forwarded-proto") || "http";
-    return `${proto}://${host}`;
-  } catch {
-    return "http://localhost:3000";
-  }
-}
+import { getAppBaseUrl } from "@/lib/get-app-base-url";
 
 export interface PageContentData {
   hero: {
@@ -32,7 +20,7 @@ export interface PageContentData {
 
 export async function fetchPageContent(): Promise<PageContentData | null> {
   try {
-    const baseUrl = await getBaseUrl();
+    const baseUrl = await getAppBaseUrl();
     const res = await fetch(`${baseUrl}/api/content`, { cache: "no-store" });
     if (!res.ok) return null;
     const json = await res.json();

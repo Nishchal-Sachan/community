@@ -1,0 +1,72 @@
+/*
+ * Tailwind v4 theme extension — imported after `@import "tailwindcss"` in app/globals.css.
+ * Keep color hex values in sync with styles/theme.ts.
+ */
+@theme {
+  --color-primary: #f57c00;
+  --color-primary-hover: #e65100;
+  --color-secondary: #1a1a1a;
+  --color-accent: #2e7d32;
+  --color-on-primary: #ffffff;
+  --color-on-secondary: #ffffff;
+  --color-background-light: #f9f9f9;
+  --color-background-white: #ffffff;
+  --color-body: #222;
+  --color-subtle: #666;
+  --color-muted: #999;
+  --color-border-muted: #e8e8e8;
+
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.06);
+  --shadow-card-hover: 0 10px 15px -3px rgb(0 0 0 / 0.08),
+    0 4px 6px -4px rgb(0 0 0 / 0.08);
+}
+
+/*
+ * Next.js font CSS variables → Tailwind font-* utilities (see @theme inline docs)
+ */
+@theme inline {
+  --font-heading: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer utilities {
+  /* Vertical padding: mobile py-16, desktop py-24 — use on every marketing <Section> */
+  .section-spacing {
+    @apply py-16 md:py-24;
+  }
+
+  /* Default stack inside a section (no ad-hoc mt-* between blocks) */
+  .section-stack {
+    @apply flex flex-col gap-8;
+  }
+
+  /* Global typography scale */
+  .type-h1 {
+    @apply font-heading text-4xl font-extrabold leading-tight text-gray-900 sm:text-5xl md:text-6xl;
+  }
+
+  .type-h2 {
+    @apply font-heading text-4xl font-bold tracking-tight text-gray-900;
+  }
+
+  .type-h3 {
+    @apply font-heading text-2xl font-semibold text-gray-900;
+  }
+
+  .type-body {
+    @apply font-body text-base leading-relaxed text-gray-600;
+  }
+
+  /* Section headings (same scale as .type-h2 / .type-body) */
+  .section-title {
+    @apply font-heading text-4xl font-bold tracking-tight text-gray-900;
+  }
+
+  .section-subtitle {
+    @apply max-w-2xl font-body text-base leading-relaxed text-gray-600;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 ease-out hover:scale-[1.02] hover:shadow-card-hover;
+  }
+}

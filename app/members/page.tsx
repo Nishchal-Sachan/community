@@ -1,6 +1,9 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { JoinLink } from "@/components/JoinLink";
 import PaginationControls from "@/app/_components/PaginationControls";
+import { Container } from "@/components/ui/Container";
+import { getAppBaseUrl } from "@/lib/get-app-base-url";
 
 interface Member {
   _id: string;
@@ -24,7 +27,7 @@ interface ApiResponse {
 }
 
 async function fetchMembers(page: number): Promise<ApiResponse> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
+  const baseUrl = await getAppBaseUrl();
   const res = await fetch(`${baseUrl}/api/members?page=${page}`, {
     cache: "no-store",
   });
@@ -41,10 +44,12 @@ function MemberCard({ member }: { member: Member }) {
   });
 
   return (
-    <div className="min-w-0 overflow-hidden rounded-lg border border-slate-200 bg-white px-5 py-4">
-      <p className="font-medium text-slate-900">{member.name}</p>
-      <p className="mt-0.5 text-sm text-slate-500">{member.area}</p>
-      <p className="mt-1 text-xs text-slate-400">Joined {joined}</p>
+    <div className="min-w-0 overflow-hidden rounded-lg border border-gray-200 bg-white px-5 py-4">
+      <div className="flex flex-col gap-1">
+        <p className="font-medium text-gray-900">{member.name}</p>
+        <p className="text-sm text-gray-500">{member.area}</p>
+        <p className="text-xs text-gray-400">Joined {joined}</p>
+      </div>
     </div>
   );
 }
@@ -56,7 +61,7 @@ async function MembersList({ page }: { page: number }) {
     data = await fetchMembers(page);
   } catch {
     return (
-      <div className="rounded-lg border border-slate-200 bg-white px-6 py-10 text-center text-sm text-slate-600">
+      <div className="rounded-lg border border-gray-200 bg-white px-6 py-10 text-center text-sm text-gray-600">
         Failed to load members. Please try again later.
       </div>
     );
@@ -66,30 +71,29 @@ async function MembersList({ page }: { page: number }) {
 
   if (members.length === 0) {
     return (
-      <div className="rounded-lg border border-slate-200 bg-white px-6 py-16 text-center">
-        <p className="text-slate-600">No members yet. Be the first to join.</p>
-        <Link
-          href="/#join-community"
-          className="mt-4 inline-flex min-h-[44px] items-center rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+      <div className="flex flex-col items-center gap-4 rounded-lg border border-gray-200 bg-white px-6 py-16 text-center">
+        <p className="type-body">No members yet. Be the first to join.</p>
+        <JoinLink
+          className="inline-flex min-h-[44px] items-center rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
         >
           Join our community
-        </Link>
+        </JoinLink>
       </div>
     );
   }
 
   return (
-    <>
-      <p className="mb-6 text-sm text-slate-500">
+    <div className="flex flex-col gap-8">
+      <p className="text-sm text-gray-500">
         Showing{" "}
-        <span className="font-medium text-slate-700">
+        <span className="font-medium text-gray-700">
           {(pagination.page - 1) * pagination.pageSize + 1}–
           {Math.min(pagination.page * pagination.pageSize, pagination.total)}
         </span>{" "}
-        of <span className="font-medium text-slate-700">{pagination.total}</span> members
+        of <span className="font-medium text-gray-700">{pagination.total}</span> members
       </p>
 
-      <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid min-w-0 grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
         {members.map((member) => (
           <MemberCard key={member._id} member={member} />
         ))}
@@ -103,7 +107,7 @@ async function MembersList({ page }: { page: number }) {
           hasPrevPage={pagination.hasPrevPage}
         />
       </Suspense>
-    </>
+    </div>
   );
 }
 
@@ -116,34 +120,35 @@ export default async function MembersPage({
   const page = Math.max(1, parseInt(params.page ?? "1", 10) || 1);
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-slate-50 px-6 py-12">
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-10 flex min-w-0 flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl">Community Members</h1>
-            <p className="mt-1 text-sm text-slate-500">People who have joined our community</p>
+    <main className="min-h-screen overflow-x-hidden bg-gray-50">
+      <Container className="flex flex-col gap-8 py-16">
+        <div className="flex min-w-0 flex-wrap items-center justify-between gap-4">
+          <div className="flex flex-col gap-2">
+            <h1 className="type-h1">Community Members</h1>
+            <p className="font-body text-sm leading-relaxed text-gray-600">
+              People who have joined our community
+            </p>
           </div>
-          <Link
-            href="/#join-community"
-            className="flex min-h-[44px] items-center rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          <JoinLink
+            className="flex min-h-[44px] items-center rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
           >
             Join now
-          </Link>
+          </JoinLink>
         </div>
 
         <Suspense
           key={page}
           fallback={
-            <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid min-w-0 grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
               {Array.from({ length: 12 }).map((_, i) => (
-                <div key={i} className="h-20 animate-pulse rounded-lg bg-slate-200" />
+                <div key={i} className="h-20 animate-pulse rounded-lg bg-gray-200" />
               ))}
             </div>
           }
         >
           <MembersList page={page} />
         </Suspense>
-      </div>
+      </Container>
     </main>
   );
 }

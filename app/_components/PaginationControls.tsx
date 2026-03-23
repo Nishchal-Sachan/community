@@ -28,16 +28,16 @@ export default function PaginationControls({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
+    <div className="flex flex-wrap items-center justify-between gap-4">
       <button
         onClick={() => goToPage(currentPage - 1)}
         disabled={!hasPrevPage}
-        className="min-h-[44px] min-w-[44px] rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+        className="min-h-[44px] min-w-[44px] rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
       >
         Previous
       </button>
 
-      <span className="text-sm text-slate-600">
+      <span className="text-sm text-gray-600">
         Page <span className="font-medium">{currentPage}</span> of{" "}
         <span className="font-medium">{totalPages}</span>
       </span>
@@ -45,7 +45,7 @@ export default function PaginationControls({
       <button
         onClick={() => goToPage(currentPage + 1)}
         disabled={!hasNextPage}
-        className="min-h-[44px] min-w-[44px] rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+        className="min-h-[44px] min-w-[44px] rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
       >
         Next
       </button>

@@ -1,67 +1,44 @@
 import { Suspense } from "react";
 import HomeContentSections from "./_components/HomeContentSections";
-import EventsSection from "./_components/EventsSection";
-import JoinSection from "./_components/JoinSection";
-import MembersPreviewSection from "./_components/MembersPreviewSection";
 import Footer from "./_components/Footer";
+import LeadershipSection from "./_components/LeadershipSection";
+import OurGoalSection from "./_components/OurGoalSection";
+import OurServicesSection from "./_components/OurServicesSection";
+import PillarsSection from "./_components/PillarsSection";
+import FullWidthCTASection from "./_components/FullWidthCTASection";
 
 function HeroLoadingFallback() {
   return (
-    <div className="flex min-h-[85vh] items-center justify-center bg-slate-800">
-      <div className="h-12 w-64 animate-pulse rounded-lg bg-slate-700" />
+    <div className="flex h-[90vh] min-h-[22rem] w-full items-center bg-secondary">
+      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl space-y-4">
+          <div className="h-12 w-4/5 max-w-md animate-pulse rounded-md bg-on-primary/20 md:h-16" />
+          <div className="h-6 w-full max-w-lg animate-pulse rounded-md bg-on-primary/15 md:h-7" />
+          <div className="h-10 w-40 animate-pulse rounded-md bg-primary/40" />
+        </div>
+      </div>
     </div>
-  );
-}
-
-function AboutLoadingFallback() {
-  return (
-    <div className="flex min-h-[28rem] items-center justify-center bg-gray-50">
-      <div className="h-64 w-full max-w-6xl animate-pulse rounded-2xl bg-gray-200" />
-    </div>
-  );
-}
-
-function InitiativesLoadingFallback() {
-  return (
-    <div className="flex min-h-[24rem] items-center justify-center bg-slate-50">
-      <div className="h-48 w-full max-w-6xl animate-pulse rounded-xl bg-slate-200" />
-    </div>
-  );
-}
-
-function ContentLoadingFallback() {
-  return (
-    <>
-      <HeroLoadingFallback />
-      <AboutLoadingFallback />
-      <InitiativesLoadingFallback />
-    </>
   );
 }
 
 export default function HomePage() {
   return (
     <main className="min-h-screen overflow-x-hidden">
-      {/* Hero, About, Initiatives – fetched from GET /api/content */}
-      <Suspense fallback={<ContentLoadingFallback />}>
+      <Suspense fallback={<HeroLoadingFallback />}>
         <HomeContentSections />
       </Suspense>
 
-      {/* Section 4 – Upcoming Events */}
-      <Suspense fallback={null}>
-        <EventsSection />
-      </Suspense>
+      <LeadershipSection />
 
-      {/* Section 5 – Join Community Form */}
-      <JoinSection />
+      <OurGoalSection />
 
-      {/* Section 6 – Members Preview */}
-      <Suspense fallback={null}>
-        <MembersPreviewSection />
-      </Suspense>
+      <OurServicesSection />
 
-      {/* Section 7 – Footer */}
-      <Suspense fallback={<div className="h-64 bg-slate-900" />}>
+      <PillarsSection />
+
+      <FullWidthCTASection />
+
+      <Suspense fallback={<div className="h-64 bg-gray-950" />}>
         <Footer />
       </Suspense>
     </main>

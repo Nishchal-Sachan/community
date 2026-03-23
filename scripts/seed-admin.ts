@@ -4,7 +4,7 @@
  * Usage:
  *   npx tsx scripts/seed-admin.ts
  *
- * Make sure MONGODB_URI is set in .env.local before running.
+ * Make sure DATABASE_URL or MONGODB_URI is set in .env.local before running.
  */
 
 import mongoose from "mongoose";
@@ -14,9 +14,9 @@ import path from "path";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI = process.env.DATABASE_URL ?? process.env.MONGODB_URI;
 if (!MONGODB_URI) {
-  console.error("ERROR: MONGODB_URI is not defined in .env.local");
+  console.error("ERROR: DATABASE_URL or MONGODB_URI is not defined in .env.local");
   process.exit(1);
 }
 

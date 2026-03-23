@@ -1,119 +1,155 @@
 import Link from "next/link";
-import { connectDB } from "@/lib/db";
-import { getSiteSettings } from "@/lib/models/SiteSettings";
+import type { LucideIcon } from "lucide-react";
+import { Facebook, Instagram, Linkedin, Twitter } from "lucide-react";
 
-const MISSION = "Serving the community with integrity, transparency, and a commitment to local development.";
+const ABOUT =
+  "Akhil Bhartiya Kushwaha Mahasabha (ABKM) is a national organisation devoted to member empowerment, community representation, and coordinated action across states—linking rural constituencies with urban networks for shared progress.";
 
-async function getLeaderName(): Promise<string> {
-  try {
-    await connectDB();
-    const settings = await getSiteSettings();
-    return settings.heroTitle;
-  } catch {
-    return "Community Leader";
-  }
+const MEMBERSHIP_ITEMS = [
+  "General Membership",
+  "Executive Membership",
+  "Corporate Membership",
+] as const;
+
+const SOCIAL_LINKS = [
+  { label: "Facebook", href: "https://facebook.com", Icon: Facebook },
+  { label: "X", href: "https://twitter.com", Icon: Twitter },
+  { label: "LinkedIn", href: "https://linkedin.com", Icon: Linkedin },
+  { label: "Instagram", href: "https://instagram.com", Icon: Instagram },
+] as const;
+
+function SocialIcon({
+  href,
+  label,
+  Icon,
+}: {
+  href: string;
+  label: string;
+  Icon: LucideIcon;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={label}
+      className="flex size-10 shrink-0 items-center justify-center rounded-md bg-[#222222] text-white transition-colors hover:bg-[#F57C00] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1e293b]"
+    >
+      <Icon className="size-5" strokeWidth={1.75} aria-hidden />
+    </a>
+  );
 }
 
-export default async function Footer() {
-  const leaderName = await getLeaderName();
-
+function BrandLogo() {
   return (
-    <footer id="contact" className="overflow-hidden bg-slate-900 py-16 text-slate-300 lg:py-24">
-      <div className="mx-auto max-w-6xl px-6 sm:px-6">
-        <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4">
-          {/* Leader & Mission */}
-          <div className="lg:col-span-2">
-            <h3 className="text-lg font-semibold text-white">{leaderName}</h3>
-            <p className="mt-3 max-w-md text-sm leading-relaxed text-slate-400">
-              {MISSION}
+    <Link
+      href="/"
+      className="flex h-[50px] w-[120px] shrink-0 items-center justify-center rounded border-2 border-[#F57C00] bg-white font-heading text-lg font-bold text-[#F57C00] transition-opacity hover:opacity-90"
+      aria-label="ABKM Home"
+    >
+      ABKM
+    </Link>
+  );
+}
+
+export default function Footer() {
+  return (
+    <footer id="contact" className="bg-[#0f172a]">
+      {/* Section 1: Top Brand Bar */}
+      <div
+        className="flex flex-col items-center justify-between gap-6 border-t-4 border-[#F57C00] bg-[#111111] px-6 py-10 sm:flex-row sm:px-[60px]"
+        aria-label="Brand bar"
+      >
+        <BrandLogo />
+        <div className="flex gap-2.5">
+          {SOCIAL_LINKS.map(({ label, href, Icon }) => (
+            <SocialIcon key={label} href={href} label={label} Icon={Icon} />
+          ))}
+        </div>
+      </div>
+
+      {/* Section 2: Main Footer */}
+      <div className="px-6 py-[80px] sm:px-[60px]">
+        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-[60px] md:grid-cols-2 xl:grid-cols-4">
+          {/* Column 1: About */}
+          <div className="min-w-0">
+            <h3 className="mb-4 font-heading text-[18px] font-semibold text-white">
+              About
+            </h3>
+            <p className="mb-6 font-body text-[15px] leading-relaxed text-[#94a3b8]">
+              {ABOUT}
             </p>
+            <Link
+              href="#about"
+              className="inline-block rounded bg-[#F57C00] px-5 py-2.5 font-body text-[15px] font-medium text-white transition-colors hover:bg-[#E65100] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F57C00] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0f172a]"
+            >
+              About us
+            </Link>
           </div>
 
-          {/* Contact */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
-              Contact
+          {/* Column 2: Membership */}
+          <div className="min-w-0">
+            <h3 className="mb-4 font-heading text-[18px] font-semibold text-white">
+              Membership Options
             </h3>
-            <ul className="mt-4 space-y-2">
-              <li>
-                <a href="mailto:contact@example.org" className="transition hover:text-white">
-                  contact@example.org
-                </a>
-              </li>
-              <li>
-                <a href="tel:+15551234567" className="transition hover:text-white">
-                  (555) 123-4567
-                </a>
-              </li>
+            <ul className="flex flex-col gap-3 font-body text-[15px] text-[#94a3b8]">
+              {MEMBERSHIP_ITEMS.map((item) => (
+                <li key={item}>
+                  <Link
+                    href="#membership"
+                    className="transition-colors hover:text-white"
+                  >
+                    {item}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
-          {/* Quick Links & Social */}
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-white">
-              Quick Links
+          {/* Column 3: Office */}
+          <div className="min-w-0">
+            <h3 className="mb-4 font-heading text-[18px] font-semibold text-white">
+              Our Office
             </h3>
-            <ul className="mt-4 space-y-2">
-              <li>
-                <Link href="/" className="transition hover:text-white">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <a href="/#upcoming-events" className="transition hover:text-white">
-                  Events
-                </a>
-              </li>
-              <li>
-                <Link href="/members" className="transition hover:text-white">
-                  Members
-                </Link>
-              </li>
-            </ul>
+            <address className="flex flex-col gap-3 not-italic">
+              <p className="font-body text-[15px] leading-relaxed text-[#94a3b8]">
+                National Secretariat, ABKM
+                <br />
+                12-A, Community Bhawan Road
+                <br />
+                Karol Bagh, New Delhi — 110005, India
+              </p>
+              <a
+                href="mailto:example@abkm.org"
+                className="font-body text-[15px] text-[#94a3b8] transition-colors hover:text-white"
+              >
+                Email: example@abkm.org
+              </a>
+              <a
+                href="tel:+919876543210"
+                className="font-body text-[15px] text-[#94a3b8] transition-colors hover:text-white"
+              >
+                Phone: +91 9876543210
+              </a>
+            </address>
+          </div>
 
-            <h3 className="mt-8 text-sm font-semibold uppercase tracking-wider text-white">
-              Connect
+          {/* Column 4: Social */}
+          <div className="min-w-0">
+            <h3 className="mb-4 font-heading text-[18px] font-semibold text-white">
+              Social
             </h3>
-            <div className="mt-4 flex gap-3">
-              <a
-                href="https://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-slate-800 p-3 text-slate-400 transition hover:bg-slate-700 hover:text-white"
-                aria-label="Facebook"
-              >
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                </svg>
-              </a>
-              <a
-                href="https://twitter.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-slate-800 p-3 text-slate-400 transition hover:bg-slate-700 hover:text-white"
-                aria-label="Twitter"
-              >
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                </svg>
-              </a>
-              <a
-                href="https://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-lg bg-slate-800 p-3 text-slate-400 transition hover:bg-slate-700 hover:text-white"
-                aria-label="Instagram"
-              >
-                <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
-                </svg>
-              </a>
+            <div className="flex flex-wrap gap-2.5">
+              {SOCIAL_LINKS.map(({ label, href, Icon }) => (
+                <SocialIcon key={label} href={href} label={label} Icon={Icon} />
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="mt-12 border-t border-slate-800 pt-8 text-center text-sm text-slate-500">
-          <p>© 2026 {leaderName}. All Rights Reserved.</p>
+        {/* Bottom line */}
+        <div className="mx-auto mt-10 border-t border-[#222222] pt-5 text-center font-body text-[15px] text-[#94a3b8]">
+          © 2026 ABKM
         </div>
       </div>
     </footer>

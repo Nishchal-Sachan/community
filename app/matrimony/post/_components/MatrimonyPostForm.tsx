@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { MATRIMONY_MAX_GALLERY } from "@/lib/matrimony-profile";
 
-const MARITAL_STATUSES = ["Never Married", "Divorced", "Widowed", "Separated"] as const;
 const HEIGHTS = [
   "4'10\" (147 cm)",
   "5'0\" (152 cm)",
@@ -22,7 +22,7 @@ export interface MatrimonyFormData {
   fullName: string;
   age: number;
   gender: "male" | "female";
-  profilePhotoUrl: string;
+  galleryUrls: string[];
   height: string;
   maritalStatus: string;
   religion: string;
@@ -43,51 +43,71 @@ interface MatrimonyPostFormProps {
   onSuccess?: () => void;
 }
 
+function galleryFromInitial(initial?: MatrimonyFormData): string[] {
+  if (!initial) return [];
+  const g = initial.galleryUrls?.filter(Boolean) ?? [];
+  if (g.length > 0) return g.slice(0, MATRIMONY_MAX_GALLERY);
+  return [];
+}
+
 export function MatrimonyPostForm({ initialData, profileId, onSuccess }: MatrimonyPostFormProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [profilePhotoUrl, setProfilePhotoUrl] = useState(initialData?.profilePhotoUrl ?? "");
+  const [galleryUrls, setGalleryUrls] = useState<string[]>(() => galleryFromInitial(initialData));
   const isEdit = Boolean(profileId && initialData);
 
+  const syncGalleryFromInitial = useCallback(() => {
+    setGalleryUrls(galleryFromInitial(initialData));
+  }, [initialData]);
+
   useEffect(() => {
-    if (initialData?.profilePhotoUrl) {
-      setProfilePhotoUrl(initialData.profilePhotoUrl);
-    }
-  }, [initialData?.profilePhotoUrl]);
+    syncGalleryFromInitial();
+  }, [syncGalleryFromInitial]);
 
   async function handlePhotoUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = e.target.files;
+    if (!files?.length) return;
     setUploading(true);
     try {
-      const formData = new FormData();
-      formData.append("photo", file);
-      const res = await fetch("/api/matrimony/upload", {
-        method: "POST",
-        body: formData,
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (res.ok && data.url) {
-        setProfilePhotoUrl(data.url);
-        setError(null);
-      } else {
-        setError(data.error ?? "Upload failed");
+      let next = [...galleryUrls];
+      for (let i = 0; i < files.length && next.length < MATRIMONY_MAX_GALLERY; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append("photo", file);
+        const res = await fetch("/api/matrimony/upload", {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (res.ok && data.url) {
+          next = [...next, data.url].slice(0, MATRIMONY_MAX_GALLERY);
+        } else {
+          setError(data.error ?? "अपलोड विफल");
+          break;
+        }
       }
+      setGalleryUrls(next);
+      if (next.length > galleryUrls.length) setError(null);
     } catch {
-      setError("Upload failed");
+      setError("अपलोड विफल");
     } finally {
       setUploading(false);
       e.target.value = "";
     }
   }
 
+  function removePhoto(index: number) {
+    setGalleryUrls((prev) => prev.filter((_, i) => i !== index));
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
+
     setLoading(true);
 
     const form = e.currentTarget;
@@ -95,7 +115,7 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
       fullName: (form.elements.namedItem("fullName") as HTMLInputElement).value.trim(),
       age: parseInt((form.elements.namedItem("age") as HTMLInputElement).value, 10),
       gender: (form.elements.namedItem("gender") as HTMLSelectElement).value as "male" | "female",
-      profilePhotoUrl,
+      galleryUrls,
       height: (form.elements.namedItem("height") as HTMLSelectElement).value.trim(),
       maritalStatus: (form.elements.namedItem("maritalStatus") as HTMLSelectElement).value.trim(),
       religion: (form.elements.namedItem("religion") as HTMLInputElement).value.trim(),
@@ -111,9 +131,7 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
     };
 
     try {
-      const url = isEdit
-        ? `/api/matrimony/update/${profileId}`
-        : "/api/matrimony/create";
+      const url = isEdit ? `/api/matrimony/update/${profileId}` : "/api/matrimony/create";
       const method = isEdit ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -126,7 +144,7 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
       const result = await res.json();
 
       if (!res.ok) {
-        setError(result.error ?? "Something went wrong");
+        setError(result.error ?? "कुछ गलत हुआ");
         return;
       }
 
@@ -137,7 +155,7 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
         router.refresh();
       }
     } catch {
-      setError("Something went wrong");
+      setError("कुछ गलत हुआ");
     } finally {
       setLoading(false);
     }
@@ -150,14 +168,12 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       {error && (
-        <p className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </p>
+        <p className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
       )}
 
       <div>
         <label htmlFor="fullName" className={labelClass}>
-          Full Name
+          पूरा नाम
         </label>
         <input
           id="fullName"
@@ -165,14 +181,14 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
           type="text"
           required
           className={inputClass}
-          placeholder="Your full name"
+          placeholder="आपका पूरा नाम"
           defaultValue={initialData?.fullName}
         />
       </div>
 
       <div>
         <label htmlFor="age" className={labelClass}>
-          Age
+          आयु
         </label>
         <input
           id="age"
@@ -182,71 +198,94 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
           min={18}
           max={120}
           className={inputClass}
-          placeholder="e.g. 28"
+          placeholder="जैसे 28"
           defaultValue={initialData?.age}
         />
       </div>
 
       <div>
         <label htmlFor="gender" className={labelClass}>
-          Gender
+          लिंग
         </label>
-        <select id="gender" name="gender" required className={inputClass} defaultValue={initialData?.gender}>
-          <option value="">Select gender</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
+        <select
+          id="gender"
+          name="gender"
+          required
+          className={inputClass}
+          defaultValue={initialData?.gender}
+        >
+          <option value="">लिंग चुनें</option>
+          <option value="male">पुरुष</option>
+          <option value="female">महिला</option>
         </select>
       </div>
 
       <div>
-        <label className={labelClass}>
-          Profile Photo
-        </label>
+        <label className={labelClass}>प्रोफ़ाइल फोटो (1–4, अधिकतम 4)</label>
+        <p className="mb-2 font-body text-xs text-gray-500">
+          कम से कम एक फोटो जोड़ने की सिफारिश है।
+        </p>
         <div className="flex flex-col gap-3">
           <input
             ref={fileInputRef}
             type="file"
             accept="image/jpeg,image/png,image/webp"
+            multiple
             onChange={handlePhotoUpload}
             className="hidden"
           />
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            disabled={uploading}
-            className="rounded-md border border-gray-300 px-4 py-3 font-body text-sm text-gray-700 transition-colors hover:bg-gray-50 disabled:opacity-70"
+            disabled={uploading || galleryUrls.length >= MATRIMONY_MAX_GALLERY}
+            className="rounded-md border border-gray-300 px-4 py-3 font-body text-sm text-gray-700 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {uploading ? "Uploading..." : "Choose file (JPEG, PNG, WebP, max 5MB)"}
+            {uploading
+              ? "अपलोड हो रहा है..."
+              : galleryUrls.length >= MATRIMONY_MAX_GALLERY
+                ? "अधिकतम 4 फोटो"
+                : "फोटो जोड़ें (JPEG, PNG, WebP, 5MB तक)"}
           </button>
-          {profilePhotoUrl && (
-            <div className="flex items-center gap-3">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={profilePhotoUrl}
-                alt="Profile"
-                className="h-20 w-20 rounded object-cover"
-              />
-              <button
-                type="button"
-                onClick={() => setProfilePhotoUrl("")}
-                className="text-sm text-red-600 hover:underline"
-              >
-                Remove photo
-              </button>
-            </div>
+          {galleryUrls.length > 0 && (
+            <ul className="flex flex-wrap gap-3">
+              {galleryUrls.map((url, idx) => (
+                <li key={`${url}-${idx}`} className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={url}
+                    alt=""
+                    className="h-24 w-24 rounded object-cover ring-1 ring-gray-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removePhoto(idx)}
+                    className="absolute -right-1 -top-1 rounded-full bg-red-600 px-1.5 text-xs text-white hover:bg-red-700"
+                    aria-label="फोटो हटाएं"
+                  >
+                    ×
+                  </button>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </div>
 
       <div>
         <label htmlFor="height" className={labelClass}>
-          Height
+          ऊँचाई
         </label>
-        <select id="height" name="height" required className={inputClass} defaultValue={initialData?.height}>
-          <option value="">Select height</option>
+        <select
+          id="height"
+          name="height"
+          required
+          className={inputClass}
+          defaultValue={initialData?.height}
+        >
+          <option value="">ऊँचाई चुनें</option>
           {HEIGHTS.map((h) => (
             <option key={h} value={h}>
-              {h}
+              {h === "Other" ? "अन्य" : h}
             </option>
           ))}
         </select>
@@ -254,21 +293,26 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
 
       <div>
         <label htmlFor="maritalStatus" className={labelClass}>
-          Marital Status
+          वैवाहिक स्थिति
         </label>
-        <select id="maritalStatus" name="maritalStatus" required className={inputClass} defaultValue={initialData?.maritalStatus}>
-          <option value="">Select status</option>
-          {MARITAL_STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
+        <select
+          id="maritalStatus"
+          name="maritalStatus"
+          required
+          className={inputClass}
+          defaultValue={initialData?.maritalStatus}
+        >
+          <option value="">स्थिति चुनें</option>
+          <option value="Never Married">अविवाहित</option>
+          <option value="Divorced">तलाकशुदा</option>
+          <option value="Widowed">विधुर/विधवा</option>
+          <option value="Separated">अलग</option>
         </select>
       </div>
 
       <div>
         <label htmlFor="religion" className={labelClass}>
-          Religion
+          धर्म
         </label>
         <input
           id="religion"
@@ -276,14 +320,14 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
           type="text"
           required
           className={inputClass}
-          placeholder="e.g. Hindu, Sikh"
+          placeholder="जैसे हिंदू, सिख"
           defaultValue={initialData?.religion}
         />
       </div>
 
       <div>
         <label htmlFor="caste" className={labelClass}>
-          Caste
+          जाति
         </label>
         <input
           id="caste"
@@ -291,14 +335,14 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
           type="text"
           required
           className={inputClass}
-          placeholder="e.g. Kushwaha"
+          placeholder="जैसे कुशवाहा"
           defaultValue={initialData?.caste}
         />
       </div>
 
       <div>
         <label htmlFor="education" className={labelClass}>
-          Education
+          शिक्षा
         </label>
         <input
           id="education"
@@ -306,14 +350,14 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
           type="text"
           required
           className={inputClass}
-          placeholder="e.g. B.Tech, MBA"
+          placeholder="जैसे बी.टेक, एमबीए"
           defaultValue={initialData?.education}
         />
       </div>
 
       <div>
         <label htmlFor="profession" className={labelClass}>
-          Profession
+          व्यवसाय
         </label>
         <input
           id="profession"
@@ -321,14 +365,14 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
           type="text"
           required
           className={inputClass}
-          placeholder="e.g. Software Engineer"
+          placeholder="जैसे सॉफ्टवेयर इंजीनियर"
           defaultValue={initialData?.profession}
         />
       </div>
 
       <div>
         <label htmlFor="income" className={labelClass}>
-          Income
+          आय
         </label>
         <input
           id="income"
@@ -336,14 +380,14 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
           type="text"
           required
           className={inputClass}
-          placeholder="e.g. 5-10 LPA"
+          placeholder="जैसे 5-10 LPA"
           defaultValue={initialData?.income}
         />
       </div>
 
       <div>
         <label htmlFor="location" className={labelClass}>
-          Location
+          स्थान
         </label>
         <input
           id="location"
@@ -351,14 +395,14 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
           type="text"
           required
           className={inputClass}
-          placeholder="e.g. New Delhi, Mumbai"
+          placeholder="जैसे नई दिल्ली, मुंबई"
           defaultValue={initialData?.location}
         />
       </div>
 
       <div>
         <label htmlFor="about" className={labelClass}>
-          About
+          परिचय
         </label>
         <textarea
           id="about"
@@ -366,19 +410,17 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
           rows={5}
           required
           className={`${inputClass} resize-y`}
-          placeholder="Tell us about yourself, family background, expectations..."
+          placeholder="अपने बारे में, पारिवारिक पृष्ठभूमि, अपेक्षाएं बताएं..."
           defaultValue={initialData?.about}
         />
       </div>
 
       <div className="border-t border-gray-200 pt-5">
-        <p className="mb-4 font-body text-sm font-medium text-gray-700">
-          Contact details
-        </p>
+        <p className="mb-4 font-body text-sm font-medium text-gray-700">संपर्क विवरण</p>
         <div className="flex flex-col gap-5">
           <div>
             <label htmlFor="contactName" className={labelClass}>
-              Contact Name
+              संपर्क नाम
             </label>
             <input
               id="contactName"
@@ -386,13 +428,13 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
               type="text"
               required
               className={inputClass}
-              placeholder="Your name or guardian/relative"
+              placeholder="आपका नाम या अभिभावक/संबंधी"
               defaultValue={initialData?.contactName}
             />
           </div>
           <div>
             <label htmlFor="contactPhone" className={labelClass}>
-              Phone
+              फ़ोन
             </label>
             <input
               id="contactPhone"
@@ -400,13 +442,13 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
               type="tel"
               required
               className={inputClass}
-              placeholder="e.g. +91 9876543210"
+              placeholder="जैसे +91 9876543210"
               defaultValue={initialData?.contactPhone}
             />
           </div>
           <div>
             <label htmlFor="contactEmail" className={labelClass}>
-              Email
+              ईमेल
             </label>
             <input
               id="contactEmail"
@@ -426,7 +468,13 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
         disabled={loading}
         className="mt-2 rounded-md bg-[#F57C00] px-6 py-3 font-body font-medium text-white transition-colors hover:bg-[#E65100] disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-[#F57C00] focus:ring-offset-2"
       >
-        {loading ? (isEdit ? "Updating..." : "Posting...") : (isEdit ? "Update Profile" : "Post Profile")}
+        {loading
+          ? isEdit
+            ? "अपडेट हो रहा है..."
+            : "पोस्ट हो रहा है..."
+          : isEdit
+            ? "प्रोफाइल अपडेट करें"
+            : "प्रोफाइल पोस्ट करें"}
       </button>
     </form>
   );

@@ -4,17 +4,17 @@ import { useCallback, useEffect, useState } from "react";
 import { JobPostForm } from "../post/_components/JobPostForm";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
-const CATEGORIES = [
-  "Technology",
-  "Healthcare",
-  "Education",
-  "Agriculture",
-  "Retail",
-  "Manufacturing",
-  "Services",
-  "Government",
-  "Other",
-] as const;
+const CATEGORIES: { value: string; label: string }[] = [
+  { value: "Technology", label: "प्रौद्योगिकी" },
+  { value: "Healthcare", label: "स्वास्थ्य सेवा" },
+  { value: "Education", label: "शिक्षा" },
+  { value: "Agriculture", label: "कृषि" },
+  { value: "Retail", label: "खुदरा" },
+  { value: "Manufacturing", label: "विनिर्माण" },
+  { value: "Services", label: "सेवाएं" },
+  { value: "Government", label: "सरकार" },
+  { value: "Other", label: "अन्य" },
+];
 
 interface JobItem {
   id: string;
@@ -112,7 +112,7 @@ export function JobsListing() {
               : "bg-white text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50"
           }`}
         >
-          Jobs
+          नौकरियां
         </button>
         <button
           type="button"
@@ -123,7 +123,7 @@ export function JobsListing() {
               : "bg-white text-gray-700 shadow-sm ring-1 ring-gray-200 hover:bg-gray-50"
           }`}
         >
-          Job Seekers
+          नौकरी चाहने वाले
         </button>
       </div>
 
@@ -131,7 +131,7 @@ export function JobsListing() {
       <div className="flex flex-col gap-4 sm:flex-row">
         <input
           type="search"
-          placeholder="Search jobs..."
+          placeholder="नौकरियां खोजें..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 rounded-md border border-gray-300 px-4 py-2.5 font-body text-gray-900 placeholder-gray-500 focus:border-[#F57C00] focus:outline-none focus:ring-1 focus:ring-[#F57C00]"
@@ -141,10 +141,10 @@ export function JobsListing() {
           onChange={(e) => setCategory(e.target.value)}
           className="rounded-md border border-gray-300 px-4 py-2.5 font-body text-gray-900 focus:border-[#F57C00] focus:outline-none focus:ring-1 focus:ring-[#F57C00] sm:w-48"
         >
-          <option value="">All categories</option>
+          <option value="">सभी श्रेणियां</option>
           {CATEGORIES.map((cat) => (
-            <option key={cat} value={cat}>
-              {cat}
+            <option key={cat.value} value={cat.value}>
+              {cat.label}
             </option>
           ))}
         </select>
@@ -153,11 +153,11 @@ export function JobsListing() {
       {/* List */}
       {loading ? (
         <div className="rounded-[12px] border border-[#eeeeee] bg-white px-6 py-12 text-center font-body text-gray-500 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
-          Loading...
+          लोड हो रहा है...
         </div>
       ) : jobs.length === 0 ? (
         <div className="rounded-[12px] border border-[#eeeeee] bg-white px-6 py-12 text-center font-body text-gray-500 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
-          No {activeTab === "job" ? "jobs" : "profiles"} found.
+          कोई {activeTab === "job" ? "नौकरी" : "प्रोफाइल"} नहीं मिली।
         </div>
       ) : (
         <div className="grid min-w-0 grid-cols-1 gap-5 sm:grid-cols-2">
@@ -170,7 +170,7 @@ export function JobsListing() {
                 {job.title}
               </h3>
               <p className="mb-3 font-body text-[14px] text-gray-500">
-                {job.category}
+                {CATEGORIES.find((c) => c.value === job.category)?.label ?? job.category}
                 {job.location ? ` · ${job.location}` : ""}
               </p>
               <p className="mb-4 font-body text-[14px] leading-[1.7] text-[#555555]">
@@ -200,14 +200,14 @@ export function JobsListing() {
                     onClick={() => setEditingJob(job)}
                     className="rounded-md border border-gray-300 px-3 py-1.5 font-body text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#F57C00] focus:ring-offset-1"
                   >
-                    Edit
+                    संपादित करें
                   </button>
                   <button
                     type="button"
                     onClick={() => setDeletingJobId(job.id)}
                     className="rounded-md border border-red-300 bg-red-50 px-3 py-1.5 font-body text-sm font-medium text-red-700 transition-colors hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
                   >
-                    Delete
+                    हटाएं
                   </button>
                 </div>
               )}
@@ -228,13 +228,13 @@ export function JobsListing() {
           >
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-heading text-xl font-semibold text-gray-900">
-                Edit Job
+                नौकरी संपादित करें
               </h2>
               <button
                 type="button"
                 onClick={() => setEditingJob(null)}
                 className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                aria-label="Close"
+                aria-label="बंद करें"
               >
                 ×
               </button>
@@ -268,7 +268,7 @@ export function JobsListing() {
             onClick={(e) => e.stopPropagation()}
           >
             <p className="mb-6 font-body text-gray-700">
-              Are you sure you want to remove this post?
+              क्या आप वाकई इस पोस्ट को हटाना चाहते हैं?
             </p>
             <div className="flex justify-end gap-3">
               <button
@@ -276,7 +276,7 @@ export function JobsListing() {
                 onClick={() => setDeletingJobId(null)}
                 className="rounded-md border border-gray-300 px-4 py-2 font-body text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
-                Cancel
+                रद्द करें
               </button>
               <button
                 type="button"
@@ -284,7 +284,7 @@ export function JobsListing() {
                 disabled={deleteLoading}
                 className="rounded-md bg-red-600 px-4 py-2 font-body text-sm font-medium text-white hover:bg-red-700 disabled:opacity-70"
               >
-                {deleteLoading ? "Deleting..." : "Delete"}
+                {deleteLoading ? "हटाया जा रहा है..." : "हटाएं"}
               </button>
             </div>
           </div>

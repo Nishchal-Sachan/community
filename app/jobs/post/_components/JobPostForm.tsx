@@ -15,6 +15,18 @@ const CATEGORIES = [
   "Other",
 ] as const;
 
+const CATEGORY_LABELS: Record<string, string> = {
+  Technology: "प्रौद्योगिकी",
+  Healthcare: "स्वास्थ्य सेवा",
+  Education: "शिक्षा",
+  Agriculture: "कृषि",
+  Retail: "खुदरा",
+  Manufacturing: "विनिर्माण",
+  Services: "सेवाएं",
+  Government: "सरकार",
+  Other: "अन्य",
+};
+
 export interface JobFormData {
   type: "job" | "profile";
   title: string;
@@ -74,7 +86,7 @@ export function JobPostForm({ initialData, jobId, onSuccess }: JobPostFormProps)
       const result = await res.json();
 
       if (!res.ok) {
-        setError(result.error ?? "Something went wrong");
+        setError(result.error ?? "कुछ गलत हुआ");
         return;
       }
 
@@ -85,7 +97,7 @@ export function JobPostForm({ initialData, jobId, onSuccess }: JobPostFormProps)
         router.refresh();
       }
     } catch {
-      setError("Something went wrong");
+      setError("कुछ गलत हुआ");
     } finally {
       setLoading(false);
     }
@@ -106,7 +118,7 @@ export function JobPostForm({ initialData, jobId, onSuccess }: JobPostFormProps)
       {!isEdit && (
         <div>
           <label htmlFor="type" className={labelClass}>
-            I want to
+            मुझे चाहिए
           </label>
           <select
             id="type"
@@ -115,15 +127,15 @@ export function JobPostForm({ initialData, jobId, onSuccess }: JobPostFormProps)
             className={inputClass}
             defaultValue="job"
           >
-            <option value="job">I want to hire</option>
-            <option value="profile">I am looking for work</option>
+            <option value="job">मुझे नौकरी देनी है</option>
+            <option value="profile">मुझे नौकरी ढूँढनी है</option>
           </select>
         </div>
       )}
 
       <div>
         <label htmlFor="title" className={labelClass}>
-          Title
+          शीर्षक
         </label>
         <input
           id="title"
@@ -131,14 +143,14 @@ export function JobPostForm({ initialData, jobId, onSuccess }: JobPostFormProps)
           type="text"
           required
           className={inputClass}
-          placeholder="e.g. Frontend Developer, Sales Manager"
+          placeholder="जैसे फ्रंटएंड डेवलपर, सेल्स मैनेजर"
           defaultValue={initialData?.title}
         />
       </div>
 
       <div>
         <label htmlFor="description" className={labelClass}>
-          Description
+          विवरण
         </label>
         <textarea
           id="description"
@@ -146,20 +158,20 @@ export function JobPostForm({ initialData, jobId, onSuccess }: JobPostFormProps)
           rows={5}
           required
           className={`${inputClass} resize-y`}
-          placeholder="Describe the role or your experience..."
+          placeholder="भूमिका या अपने अनुभव का विवरण दें..."
           defaultValue={initialData?.description}
         />
       </div>
 
       <div>
         <label htmlFor="category" className={labelClass}>
-          Category
+          श्रेणी
         </label>
         <select id="category" name="category" required className={inputClass} defaultValue={initialData?.category}>
-          <option value="">Select category</option>
+          <option value="">श्रेणी चुनें</option>
           {CATEGORIES.map((cat) => (
             <option key={cat} value={cat}>
-              {cat}
+              {CATEGORY_LABELS[cat] ?? cat}
             </option>
           ))}
         </select>
@@ -167,7 +179,7 @@ export function JobPostForm({ initialData, jobId, onSuccess }: JobPostFormProps)
 
       <div>
         <label htmlFor="location" className={labelClass}>
-          Location
+          स्थान
         </label>
         <input
           id="location"
@@ -175,19 +187,19 @@ export function JobPostForm({ initialData, jobId, onSuccess }: JobPostFormProps)
           type="text"
           required
           className={inputClass}
-          placeholder="e.g. New Delhi, Remote"
+          placeholder="जैसे नई दिल्ली, रिमोट"
           defaultValue={initialData?.location}
         />
       </div>
 
       <div className="border-t border-gray-200 pt-5">
         <p className="mb-4 font-body text-sm font-medium text-gray-700">
-          Contact details
+          संपर्क विवरण
         </p>
         <div className="flex flex-col gap-5">
           <div>
             <label htmlFor="contactName" className={labelClass}>
-              Contact Name
+              संपर्क नाम
             </label>
             <input
               id="contactName"
@@ -195,13 +207,13 @@ export function JobPostForm({ initialData, jobId, onSuccess }: JobPostFormProps)
               type="text"
               required
               className={inputClass}
-              placeholder="Your name or contact person"
+              placeholder="आपका नाम या संपर्क व्यक्ति"
               defaultValue={initialData?.contactName}
             />
           </div>
           <div>
             <label htmlFor="contactPhone" className={labelClass}>
-              Phone
+              फ़ोन
             </label>
             <input
               id="contactPhone"
@@ -209,13 +221,13 @@ export function JobPostForm({ initialData, jobId, onSuccess }: JobPostFormProps)
               type="tel"
               required
               className={inputClass}
-              placeholder="e.g. +91 9876543210"
+              placeholder="जैसे +91 9876543210"
               defaultValue={initialData?.contactPhone}
             />
           </div>
           <div>
             <label htmlFor="contactEmail" className={labelClass}>
-              Email
+              ईमेल
             </label>
             <input
               id="contactEmail"
@@ -235,7 +247,7 @@ export function JobPostForm({ initialData, jobId, onSuccess }: JobPostFormProps)
         disabled={loading}
         className="mt-2 rounded-md bg-[#F57C00] px-6 py-3 font-body font-medium text-white transition-colors hover:bg-[#E65100] disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-[#F57C00] focus:ring-offset-2"
       >
-        {loading ? (isEdit ? "Updating..." : "Posting...") : (isEdit ? "Update Job" : "Post Job")}
+        {loading ? (isEdit ? "अपडेट हो रहा है..." : "पोस्ट हो रहा है...") : (isEdit ? "नौकरी अपडेट करें" : "नौकरी पोस्ट करें")}
       </button>
     </form>
   );

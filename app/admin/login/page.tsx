@@ -5,7 +5,7 @@ import { Suspense } from "react";
 
 function LoginForm() {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") ?? "/admin/dashboard";
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/admin";
   const errorFromUrl = searchParams.get("error");
 
   const inputBase =

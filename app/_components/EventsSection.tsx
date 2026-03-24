@@ -33,7 +33,7 @@ async function getUpcomingEvents(): Promise<IEvent[]> {
 }
 
 function EventCard({ event }: { event: IEvent }) {
-  const formattedDate = new Date(event.date).toLocaleDateString("en-US", {
+    const formattedDate = new Date(event.date).toLocaleDateString("hi-IN", {
     weekday: "short",
     year: "numeric",
     month: "short",
@@ -63,7 +63,7 @@ function EventCard({ event }: { event: IEvent }) {
           type="button"
           className="min-h-[44px] w-fit rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 transition hover:bg-gray-50"
         >
-          Learn More
+          और जानें
         </button>
       </div>
     </div>
@@ -74,7 +74,7 @@ function EmptyState() {
   return (
     <div className="rounded-xl border border-gray-200 bg-gray-50 px-6 py-14 text-center sm:px-8 sm:py-16">
       <p className="type-body text-lg">
-        No upcoming events at the moment. Stay connected for updates.
+        कोई कार्यक्रम उपलब्ध नहीं है
       </p>
     </div>
   );
@@ -88,9 +88,9 @@ export default async function EventsSection() {
       <Container>
         <div className="section-stack">
           <div className="flex flex-col items-center gap-3 text-center">
-            <h2 className="type-h2">Upcoming Events</h2>
+            <h2 className="type-h2">आगामी कार्यक्रम</h2>
             <p className="type-body max-w-2xl">
-              Don&apos;t miss out—here&apos;s what&apos;s happening in our community.
+              हमारे समुदाय में होने वाली गतिविधियाँ — इन्हें मिस न करें।
             </p>
           </div>
 

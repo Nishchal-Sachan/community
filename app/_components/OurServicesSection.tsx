@@ -33,7 +33,7 @@ export default function OurServicesSection() {
     >
       <div className="mx-auto max-w-[1200px]">
         <p className="text-center font-body text-[12px] uppercase tracking-[3px] text-[#F57C00]">
-          JOIN WITH US
+          हमसे जुड़ें
         </p>
 
         <h2

@@ -1,42 +1,50 @@
 "use client";
 
 import { JoinLink } from "@/components/JoinLink";
-import { useCallback, useEffect, useState } from "react";
+import type { CtaSlide } from "@/lib/site-content-types";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
-const SLIDES = [
+const DEFAULT_SLIDES: readonly CtaSlide[] = [
   {
     id: "slide-1",
     image:
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&h=900&fit=crop&q=80",
-    heading: "Transform Your Community, Transform the Nation",
-    buttonText: "Join Today",
+    heading: "अपने समुदाय को बदलें, देश को बदलें",
+    buttonText: "आज ही जुड़ें",
   },
   {
     id: "slide-2",
     image:
       "https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=1920&h=900&fit=crop&q=80",
-    heading: "Step Into Change – Join ABKM and Build a Self-Reliant India!",
-    buttonText: "Get Started",
+    heading: "बदलाव की ओर कदम बढ़ाएं — ABKM से जुड़कर आत्मनिर्भर भारत का निर्माण करें",
+    buttonText: "शुरू करें",
   },
   {
     id: "slide-3",
     image:
       "https://images.unsplash.com/photo-1579684385127-1ef15d508118?w=1920&h=900&fit=crop&q=80",
-    heading: "Empowering Every Member for a Stronger Future",
-    buttonText: "Join Today",
+    heading: "प्रत्येक सदस्य को सशक्त बनाकर एक मजबूत भविष्य की ओर",
+    buttonText: "आज ही जुड़ें",
   },
   {
     id: "slide-4",
     image:
       "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1920&h=900&fit=crop&q=80",
-    heading: "Together We Rise, Together We Lead",
-    buttonText: "Join Today",
+    heading: "एक साथ उठें, एक साथ आगे बढ़ें",
+    buttonText: "भागीदार बनें",
   },
 ] as const;
 
 const SLIDE_INTERVAL_MS = 4000;
 
-export default function FullWidthCTASection() {
+type Props = { slides?: CtaSlide[] | null };
+
+export default function FullWidthCTASection({ slides: slidesProp }: Props) {
+  const slides = useMemo((): readonly CtaSlide[] => {
+    if (slidesProp && slidesProp.length > 0) return slidesProp;
+    return DEFAULT_SLIDES;
+  }, [slidesProp]);
+
   const [activeIndex, setActiveIndex] = useState(0);
 
   const goToSlide = useCallback((index: number) => {
@@ -44,20 +52,24 @@ export default function FullWidthCTASection() {
   }, []);
 
   useEffect(() => {
+    setActiveIndex(0);
+  }, [slides]);
+
+  useEffect(() => {
     const timer = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % SLIDES.length);
+      setActiveIndex((prev) => (prev + 1) % slides.length);
     }, SLIDE_INTERVAL_MS);
     return () => clearInterval(timer);
-  }, []);
+  }, [slides]);
 
   return (
     <section
       id="cta-community"
-      className="relative h-[500px] w-full overflow-hidden"
+      className="relative h-125 w-full overflow-hidden"
       aria-roledescription="carousel"
       aria-labelledby="cta-community-heading"
     >
-      {SLIDES.map((slide, index) => (
+      {slides.map((slide, index) => (
         <div
           key={slide.id}
           role="group"
@@ -90,7 +102,7 @@ export default function FullWidthCTASection() {
           >
             <h2
               id={index === 0 ? "cta-community-heading" : undefined}
-              className="mx-auto mb-5 max-w-[900px] font-heading text-[48px] font-bold leading-[1.2] text-white max-md:text-[36px] max-sm:text-[28px]"
+              className="mx-auto mb-5 max-w-225 font-heading text-[48px] font-bold leading-[1.2] text-white max-md:text-[36px] max-sm:text-[28px]"
             >
               {slide.heading}
             </h2>
@@ -105,17 +117,17 @@ export default function FullWidthCTASection() {
 
       {/* Dot indicators */}
       <div
-        className="absolute bottom-[30px] left-1/2 flex -translate-x-1/2 gap-2.5"
+        className="absolute bottom-7.5 left-1/2 flex -translate-x-1/2 gap-2.5"
         role="tablist"
-        aria-label="Slide navigation"
+        aria-label="स्लाइड नेविगेशन"
       >
-        {SLIDES.map((_, index) => (
+        {slides.map((s, index) => (
           <button
-            key={SLIDES[index].id}
+            key={s.id}
             type="button"
             role="tab"
             aria-selected={activeIndex === index}
-            aria-label={`Go to slide ${index + 1}`}
+            aria-label={`स्लाइड ${index + 1} पर जाएं`}
             onClick={() => goToSlide(index)}
             className={`h-2.5 w-2.5 shrink-0 rounded-full transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-black/50 ${
               activeIndex === index

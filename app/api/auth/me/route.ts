@@ -3,6 +3,7 @@ import { connectDB } from "@/lib/db";
 import User from "@/lib/models/User";
 import { getUserFromCookie } from "@/lib/user-auth";
 import { handleApiError } from "@/lib/api-error";
+import { resolveMembershipStatus } from "@/lib/member-access";
 
 // GET /api/auth/me — returns current user from JWT cookie
 export async function GET() {
@@ -22,6 +23,19 @@ export async function GET() {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
+    const membershipStatus = resolveMembershipStatus(
+      user as {
+        membershipStatus?: string;
+        role?: string;
+        membership?: { isPaid?: boolean };
+      }
+    );
+
+    const marriageSubscriptionStatus =
+      (user as { marriageSubscriptionStatus?: string }).marriageSubscriptionStatus === "active"
+        ? "active"
+        : "none";
+
     return NextResponse.json({
       user: {
         id: user._id.toString(),
@@ -29,6 +43,8 @@ export async function GET() {
         email: user.email,
         role: user.role,
         membership: user.membership,
+        membershipStatus,
+        marriageSubscriptionStatus,
       },
     });
   } catch (error) {

@@ -5,6 +5,7 @@ export interface IMatrimony extends Document {
   age: number;
   gender: "male" | "female";
   profilePhotoUrl: string;
+  galleryUrls: string[];
   height: string;
   maritalStatus: string;
   religion: string;
@@ -62,6 +63,16 @@ const MatrimonySchema = new Schema<IMatrimony>(
       default: "",
       trim: true,
       maxlength: [MAX_LENGTHS.profilePhotoUrl, `Photo URL cannot exceed ${MAX_LENGTHS.profilePhotoUrl} characters`],
+    },
+    galleryUrls: {
+      type: [String],
+      default: [],
+      validate: {
+        validator(v: unknown[]) {
+          return Array.isArray(v) && v.length <= 4;
+        },
+        message: "At most 4 gallery images allowed",
+      },
     },
     height: {
       type: String,

@@ -2,10 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import Job from "@/lib/models/Job";
 import { handleApiError } from "@/lib/api-error";
+import { requireActiveMember } from "@/lib/require-active-member";
 
 // GET /api/jobs/list?type=job|profile&category=...&search=...
 export async function GET(req: NextRequest) {
   try {
+    const gate = await requireActiveMember();
+    if (!gate.ok) return gate.response;
+
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type");
     const category = searchParams.get("category");

@@ -46,6 +46,7 @@ export async function POST(req: NextRequest) {
       email: email.toLowerCase().trim(),
       password: password.trim(),
       role: "user",
+      membershipStatus: "none",
       membership: { isPaid: false },
     });
 
@@ -58,6 +59,7 @@ export async function POST(req: NextRequest) {
           email: user.email,
           role: user.role,
           membership: user.membership,
+          membershipStatus: user.membershipStatus ?? "none",
         },
       },
       { status: 201 }

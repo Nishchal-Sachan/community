@@ -7,7 +7,7 @@ export interface Leader {
 export const leaders: Leader[] = [
   {
     name: "Rakesh Mahto",
-    role: "Rashtriya Adhyaksh",
+    role: "राष्ट्रीय अध्यक्ष",
     image: "/images/leaders/rakesh-mahto.jpeg",
   },
 ];

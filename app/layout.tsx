@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: `%s | ${appName}`,
   },
   description:
-    "National organisation for empowerment, community representation, and development across India.",
+    "राष्ट्रीय स्तर का समाज कल्याण संगठन — सशक्तिकरण, समुदाय प्रतिनिधित्व और भारत भर में विकास।",
 };
 
 export default function RootLayout({
@@ -35,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${poppins.variable}`}>
+    <html lang="hi" className={`${inter.variable} ${poppins.variable}`}>
       <body className="min-h-screen bg-background-white font-body text-body antialiased">
         <Header />
         <div className="pt-[108px]">{children}</div>

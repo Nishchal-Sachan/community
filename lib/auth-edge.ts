@@ -6,7 +6,7 @@ import { jwtVerify } from "jose";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
-  throw new Error("Please define the JWT_SECRET environment variable in .env.local");
+  throw new Error("JWT_SECRET is not set. Add it to .env or .env.local (see .env.example).");
 }
 
 export interface AdminTokenPayload {

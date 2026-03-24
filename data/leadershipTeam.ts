@@ -8,7 +8,7 @@ export interface TeamLeader {
 export const leadershipTeam: TeamLeader[] = [
   {
     name: "Rakesh Mahto",
-    role: "Rashtriya Adhyaksh",
+    role: "राष्ट्रीय अध्यक्ष",
     image: "/images/leaders/rakesh-mahto.jpeg",
     primary: true,
   },
@@ -19,7 +19,7 @@ export const leadershipTeam: TeamLeader[] = [
   },
   {
     name: "Arun Kushwaha (Kannauj wale Sir)",
-    role: "Jiladyaksh Kanpur Nagar",
+    role: "जिलाध्यक्ष कानपुर नगर",
     image: "/images/leaders/arun.jpeg",
   },
 ];

@@ -1,6 +1,9 @@
 import mongoose, { Document, Model, Schema } from "mongoose";
 import bcrypt from "bcryptjs";
 
+export type UserMembershipStatus = "none" | "pending" | "active";
+export type MarriageSubscriptionStatus = "none" | "active";
+
 export interface IUserMembership {
   isPaid: boolean;
 }
@@ -10,6 +13,8 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: string;
+  membershipStatus: UserMembershipStatus;
+  marriageSubscriptionStatus: MarriageSubscriptionStatus;
   membership: IUserMembership;
   comparePassword(candidate: string): Promise<boolean>;
 }
@@ -40,6 +45,16 @@ const UserSchema = new Schema<IUser>(
       type: String,
       default: "user",
       enum: ["user", "member"],
+    },
+    membershipStatus: {
+      type: String,
+      default: "none",
+      enum: ["none", "pending", "active"],
+    },
+    marriageSubscriptionStatus: {
+      type: String,
+      default: "none",
+      enum: ["none", "active"],
     },
     membership: {
       isPaid: { type: Boolean, default: false },

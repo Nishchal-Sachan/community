@@ -7,6 +7,7 @@ import {
   USER_COOKIE_NAME,
 } from "@/lib/user-auth";
 import { ApiError, handleApiError, parseBody } from "@/lib/api-error";
+import { resolveMembershipStatus } from "@/lib/member-access";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -45,6 +46,14 @@ export async function POST(req: NextRequest) {
       role: user.role,
     });
 
+    const membershipStatus = resolveMembershipStatus(
+      user as {
+        membershipStatus?: string;
+        role?: string;
+        membership?: { isPaid?: boolean };
+      }
+    );
+
     const response = NextResponse.json(
       {
         message: "Login successful",
@@ -54,6 +63,7 @@ export async function POST(req: NextRequest) {
           email: user.email,
           role: user.role,
           membership: user.membership,
+          membershipStatus,
         },
       },
       { status: 200 }

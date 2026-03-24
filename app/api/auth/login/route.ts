@@ -85,8 +85,8 @@ export async function POST(req: NextRequest) {
     // ── Issue JWT cookie and redirect ───────────────────────────────────────
     const token = signToken({ adminId: admin._id.toString(), email: admin.email });
 
-    const target = redirectTo ?? "/admin/dashboard";
-    const safeRedirect = target.startsWith("/") && !target.startsWith("//") ? target : "/admin/dashboard";
+    const target = redirectTo ?? "/admin";
+    const safeRedirect = target.startsWith("/") && !target.startsWith("//") ? target : "/admin";
 
     const response = NextResponse.redirect(new URL(safeRedirect, req.url), { status: 302 });
     response.cookies.set(COOKIE_NAME, token, getCookieOptions());

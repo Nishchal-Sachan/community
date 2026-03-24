@@ -13,10 +13,13 @@ const FALLBACK_BG =
   "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1920&q=80";
 
 const DEFAULT_SUBTITLE = "शिक्षा, स्वास्थ्य और सम्मान — कुशवाहा समाज बने महान";
+const DEFAULT_TITLE_LINE1 = "Akhil Bhartiya";
+const DEFAULT_TITLE_LINE2 = "Kushwaha Mahasabha";
 
 export default function HeroSection({ hero }: HeroSectionProps) {
+  const title = hero?.title?.trim() ?? "";
   const subtitle = hero?.subtitle?.trim() || DEFAULT_SUBTITLE;
-  const ctaText = hero?.ctaText?.trim() || "Join Community";
+  const ctaText = hero?.ctaText?.trim() || "समुदाय से जुड़ें";
   const backgroundImage = hero?.backgroundImage?.trim() || FALLBACK_BG;
 
   return (
@@ -49,9 +52,15 @@ export default function HeroSection({ hero }: HeroSectionProps) {
             id="hero-title"
             className="max-w-150 font-heading font-bold leading-[1.1] text-white max-sm:text-[32px] sm:text-[56px] md:text-[60px] lg:text-[64px]"
           >
-            <span>Akhil Bhartiya</span>
-            <br className="max-sm:hidden" />
-            <span>Kushwaha Mahasabha</span>
+            {title ? (
+              <span className="whitespace-pre-line">{title}</span>
+            ) : (
+              <>
+                <span>{DEFAULT_TITLE_LINE1}</span>
+                <br className="max-sm:hidden" />
+                <span>{DEFAULT_TITLE_LINE2}</span>
+              </>
+            )}
           </h1>
 
           <p

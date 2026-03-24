@@ -1,11 +1,13 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = (process.env.DATABASE_URL ?? process.env.MONGODB_URI) as string;
-
-if (!MONGODB_URI) {
-  throw new Error(
-    "Please define DATABASE_URL (or legacy MONGODB_URI) in .env.local — see .env.example"
-  );
+function getMongoUri(): string {
+  const uri = (process.env.DATABASE_URL ?? process.env.MONGODB_URI)?.trim();
+  if (!uri) {
+    throw new Error(
+      "DATABASE_URL or MONGODB_URI is not set. Add it to .env or .env.local in the project root (see .env.example)."
+    );
+  }
+  return uri;
 }
 
 /**
@@ -23,8 +25,9 @@ export async function connectDB(): Promise<mongoose.Connection> {
   if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
+    const uri = getMongoUri();
     cached.promise = mongoose
-      .connect(MONGODB_URI, { bufferCommands: false })
+      .connect(uri, { bufferCommands: false })
       .then((m) => m.connection);
   }
 

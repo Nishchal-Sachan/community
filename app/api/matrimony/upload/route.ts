@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getUserFromCookie } from "@/lib/user-auth";
 import { ApiError, handleApiError } from "@/lib/api-error";
 import { cloudinary } from "@/lib/cloudinary";
+import { getMatrimonyViewerContext } from "@/lib/matrimony-access";
 
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
@@ -12,6 +13,20 @@ export async function POST(req: NextRequest) {
     const payload = await getUserFromCookie();
     if (!payload) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const viewer = await getMatrimonyViewerContext(payload);
+    if (!viewer?.isActiveMember) {
+      return NextResponse.json(
+        { error: "यह सुविधा केवल सदस्यों के लिए उपलब्ध है" },
+        { status: 403 }
+      );
+    }
+    if (!viewer.hasMarriageSubscription) {
+      return NextResponse.json(
+        { error: "Marriage subscription required to upload photos" },
+        { status: 403 }
+      );
     }
 
     if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {

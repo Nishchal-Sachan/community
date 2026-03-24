@@ -12,7 +12,7 @@ export default function OurGoalSection() {
         <div className="relative h-100 overflow-hidden rounded-2xl lg:h-125">
           <Image
             src="/images/leaders/rakesh-mahto.jpeg"
-            alt="Our Goal"
+            alt="हमारा लक्ष्य"
             fill
             className="object-cover"
             sizes="(max-width: 1024px) 100vw, 600px"

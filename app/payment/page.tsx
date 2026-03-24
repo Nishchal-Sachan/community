@@ -25,31 +25,31 @@ export default async function PaymentPage() {
       <Container className="max-w-lg">
         <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
           <h1 className="mb-2 font-heading text-2xl font-bold text-gray-900">
-            Payment
+            भुगतान
           </h1>
           <p className="mb-8 font-body text-gray-600">
-            Review your details and complete payment to finish membership.
+            अपने विवरण की समीक्षा करें और सदस्यता पूरी करने के लिए भुगतान करें।
           </p>
 
           <dl className="space-y-3 font-body">
             <div>
-              <dt className="text-sm font-medium text-gray-500">Full Name</dt>
+              <dt className="text-sm font-medium text-gray-500">पूरा नाम</dt>
               <dd className="text-gray-900">{formData.fullName ?? "—"}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">Phone</dt>
+              <dt className="text-sm font-medium text-gray-500">फ़ोन</dt>
               <dd className="text-gray-900">{formData.phone ?? "—"}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">City</dt>
+              <dt className="text-sm font-medium text-gray-500">शहर</dt>
               <dd className="text-gray-900">{formData.city ?? "—"}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">State</dt>
+              <dt className="text-sm font-medium text-gray-500">राज्य</dt>
               <dd className="text-gray-900">{formData.state ?? "—"}</dd>
             </div>
             <div>
-              <dt className="text-sm font-medium text-gray-500">Occupation</dt>
+              <dt className="text-sm font-medium text-gray-500">व्यवसाय</dt>
               <dd className="text-gray-900">{formData.occupation ?? "—"}</dd>
             </div>
           </dl>

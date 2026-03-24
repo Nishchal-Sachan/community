@@ -38,18 +38,18 @@ export default function LeadershipSection() {
     >
       <div className="px-4 sm:px-6">
         <p className="text-center font-body text-[12px] uppercase tracking-[3px] text-[#F57C00]">
-          VISION MISSION BHARAT
+          संकल्प लक्ष्य भारत
         </p>
 
         <h2
           id="leadership-heading"
           className="mt-[10px] text-center font-heading text-[42px] font-bold leading-tight text-[#222222]"
         >
-          Leadership{leaders[0] ? ` by Shri ${leaders[0].name}` : ""}
+          {leaders[0] ? `श्री ${leaders[0].name} के नेतृत्व में` : "हमारा नेतृत्व"}
         </h2>
 
         <p className="mx-auto my-5 max-w-[900px] text-center font-body text-base leading-[1.85] text-[#555555] sm:text-lg">
-          Akhil Bhartiya Kushwaha Mahasabha is committed to uplifting every section of society through unity, empowerment, and equal opportunities. Under the leadership of Shri Rakesh Mahto, the organization focuses on education, employment, social justice, and community development across rural and urban India.
+          अखिल भारतीय कुशवाहा महासभा एकता, सशक्तिकरण और समान अवसरों के माध्यम से समाज के हर वर्ग के उत्थान के लिए प्रतिबद्ध है। श्री राकेश माटो के नेतृत्व में संगठन शिक्षा, रोजगार, सामाजिक न्याय और ग्रामीण व शहरी भारत में समुदाय विकास पर केंद्रित है।
         </p>
 
         <div className="mb-[60px]">

@@ -4,6 +4,8 @@ import Matrimony from "@/lib/models/Matrimony";
 import { getUserFromCookie } from "@/lib/user-auth";
 import { ApiError, handleApiError, parseBody } from "@/lib/api-error";
 import { MATRIMONY_MAX_LENGTHS } from "@/lib/models/Matrimony";
+import { getMatrimonyViewerContext } from "@/lib/matrimony-access";
+import { normalizeMatrimonyGalleryInput } from "@/lib/matrimony-profile";
 
 const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
 
@@ -18,6 +20,7 @@ function validateCreateBody(body: unknown): {
   age: number;
   gender: "male" | "female";
   profilePhotoUrl: string;
+  galleryUrls: string[];
   height: string;
   maritalStatus: string;
   religion: string;
@@ -40,7 +43,9 @@ function validateCreateBody(body: unknown): {
   const fullName = sanitizeString(b.fullName, MATRIMONY_MAX_LENGTHS.fullName);
   const ageRaw = typeof b.age === "number" ? b.age : parseInt(String(b.age ?? ""), 10);
   const age = Number.isInteger(ageRaw) && ageRaw >= 18 && ageRaw <= 120 ? ageRaw : NaN;
-  const profilePhotoUrl = sanitizeString(b.profilePhotoUrl, MATRIMONY_MAX_LENGTHS.profilePhotoUrl);
+  const galleryUrls = normalizeMatrimonyGalleryInput(b);
+  if (galleryUrls.length > 4) throw new ApiError(400, "At most 4 images allowed");
+  const profilePhotoUrl = galleryUrls[0] ?? "";
   const height = sanitizeString(b.height, MATRIMONY_MAX_LENGTHS.height);
   const maritalStatus = sanitizeString(b.maritalStatus, MATRIMONY_MAX_LENGTHS.maritalStatus);
   const religion = sanitizeString(b.religion, MATRIMONY_MAX_LENGTHS.religion);
@@ -76,6 +81,7 @@ function validateCreateBody(body: unknown): {
     age,
     gender,
     profilePhotoUrl,
+    galleryUrls,
     height,
     maritalStatus,
     religion,
@@ -91,12 +97,26 @@ function validateCreateBody(body: unknown): {
   };
 }
 
-// POST /api/matrimony/create — logged-in users only
+// POST /api/matrimony/create — active marriage subscribers only
 export async function POST(req: NextRequest) {
   try {
     const payload = await getUserFromCookie();
     if (!payload) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const viewer = await getMatrimonyViewerContext(payload);
+    if (!viewer?.isActiveMember) {
+      return NextResponse.json(
+        { error: "यह सुविधा केवल सदस्यों के लिए उपलब्ध है" },
+        { status: 403 }
+      );
+    }
+    if (!viewer.hasMarriageSubscription) {
+      return NextResponse.json(
+        { error: "Marriage subscription required to create a profile" },
+        { status: 403 }
+      );
     }
 
     const body = await parseBody(req);
@@ -118,6 +138,7 @@ export async function POST(req: NextRequest) {
           age: profile.age,
           gender: profile.gender,
           profilePhotoUrl: profile.profilePhotoUrl,
+          galleryUrls: profile.galleryUrls ?? [],
           height: profile.height,
           maritalStatus: profile.maritalStatus,
           religion: profile.religion,

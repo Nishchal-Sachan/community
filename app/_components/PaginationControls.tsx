@@ -34,11 +34,11 @@ export default function PaginationControls({
         disabled={!hasPrevPage}
         className="min-h-[44px] min-w-[44px] rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
       >
-        Previous
+        पिछला
       </button>
 
       <span className="text-sm text-gray-600">
-        Page <span className="font-medium">{currentPage}</span> of{" "}
+        पृष्ठ <span className="font-medium">{currentPage}</span> /{" "}
         <span className="font-medium">{totalPages}</span>
       </span>
 
@@ -47,7 +47,7 @@ export default function PaginationControls({
         disabled={!hasNextPage}
         className="min-h-[44px] min-w-[44px] rounded-lg border border-gray-300 bg-white px-5 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
       >
-        Next
+        अगला
       </button>
     </div>
   );

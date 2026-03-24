@@ -7,10 +7,10 @@ const ADMIN_COOKIE_NAME = "admin_token";
 // ─── Route config (extend here to add/modify protection) ─────────────────────
 
 /** Routes requiring user auth (any role). Add path prefixes to protect. */
-const protectedRoutes = ["/join", "/payment", "/jobs", "/matrimony"];
+const protectedRoutes = ["/join", "/payment", "/jobs", "/matrimony", "/marriage"];
 
-/** Routes requiring user auth + member role. */
-const memberOnlyRoutes = ["/events", "/members"];
+/** Routes requiring user auth (any logged-in user, member or non-member). */
+const portalRoutes = ["/events", "/members"];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -31,7 +31,7 @@ async function requireUserAuth(req: NextRequest, pathname: string): Promise<Next
 }
 
 // ─── Matcher (must be static for Next.js build) ───────────────────────────────
-// Keep in sync with protectedRoutes and memberOnlyRoutes above
+// Keep in sync with protectedRoutes and portalRoutes above
 export const config = {
   matcher: [
     "/join",
@@ -42,6 +42,8 @@ export const config = {
     "/jobs/:path*",
     "/matrimony",
     "/matrimony/:path*",
+    "/marriage",
+    "/marriage/:path*",
     "/events",
     "/events/:path*",
     "/members",
@@ -63,22 +65,10 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // Member-only routes: user auth + member role
-  if (isRouteMatch(pathname, memberOnlyRoutes)) {
-    const token = req.cookies.get(USER_COOKIE_NAME)?.value;
-    const payload = token ? await verifyUserTokenEdge(token) : null;
-    if (!payload) {
-      const loginUrl = req.nextUrl.clone();
-      loginUrl.pathname = "/login";
-      loginUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-    if (payload.role !== "member") {
-      const joinUrl = req.nextUrl.clone();
-      joinUrl.pathname = "/join";
-      joinUrl.searchParams.set("callbackUrl", pathname);
-      return NextResponse.redirect(joinUrl);
-    }
+  // Portal routes: any logged-in user (member or non-member) can access
+  if (isRouteMatch(pathname, portalRoutes)) {
+    const redirect = await requireUserAuth(req, pathname);
+    if (redirect) return redirect;
     return NextResponse.next();
   }
 

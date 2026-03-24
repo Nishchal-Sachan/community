@@ -30,18 +30,18 @@ export default function JoinForm() {
 
       if (!res.ok) {
         setStatus("error");
-        setMessage(data.error ?? "Something went wrong. Please try again.");
+        setMessage(data.error ?? "कुछ गलत हुआ। कृपया पुनः प्रयास करें।");
         return;
       }
 
       setStatus("success");
-      setMessage(data.message ?? "You have successfully joined!");
+      setMessage(data.message ?? "आप सफलतापूर्वक जुड़ गए हैं!");
       setName("");
       setPhone("");
       setArea("");
     } catch {
       setStatus("error");
-      setMessage("Network error. Please check your connection.");
+      setMessage("नेटवर्क त्रुटि। कृपया अपना कनेक्शन जांचें।");
     }
   }
 
@@ -64,7 +64,7 @@ export default function JoinForm() {
           onClick={() => { setStatus("idle"); setMessage(null); }}
           className="mt-4 text-sm font-medium text-green-700 underline underline-offset-2 hover:text-green-900"
         >
-          Submit another response
+          एक और प्रतिक्रिया दें
         </button>
       </div>
     );
@@ -77,7 +77,7 @@ export default function JoinForm() {
     <form onSubmit={handleSubmit} noValidate aria-busy={loading} className="min-w-0 space-y-5">
       <div>
         <label htmlFor="join-name" className="block text-sm font-medium text-slate-700">
-          Full name <span className="text-red-500">*</span>
+          पूरा नाम <span className="text-red-500">*</span>
         </label>
         <input
           id="join-name"
@@ -94,7 +94,7 @@ export default function JoinForm() {
 
       <div>
         <label htmlFor="join-phone" className="block text-sm font-medium text-slate-700">
-          Phone number <span className="text-red-500">*</span>
+          फ़ोन नंबर <span className="text-red-500">*</span>
         </label>
         <input
           id="join-phone"
@@ -103,7 +103,7 @@ export default function JoinForm() {
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           disabled={loading}
-          placeholder="+1 234 567 8900"
+          placeholder="+91 98765 43210"
           maxLength={20}
           className={inputClass}
         />
@@ -111,7 +111,7 @@ export default function JoinForm() {
 
       <div>
         <label htmlFor="join-area" className="block text-sm font-medium text-slate-700">
-          Area / Location <span className="text-red-500">*</span>
+          क्षेत्र / स्थान <span className="text-red-500">*</span>
         </label>
         <input
           id="join-area"
@@ -120,7 +120,7 @@ export default function JoinForm() {
           value={area}
           onChange={(e) => setArea(e.target.value)}
           disabled={loading}
-          placeholder="City or neighbourhood"
+          placeholder="शहर या इलाका"
           maxLength={100}
           className={inputClass}
         />
@@ -139,7 +139,7 @@ export default function JoinForm() {
         className="flex w-full min-w-0 items-center justify-center gap-2 rounded-lg bg-slate-900 px-6 py-3.5 text-base font-semibold text-white transition hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 sm:py-4"
       >
         {loading && <Spinner />}
-        {loading ? "Submitting…" : "Join the club"}
+        {loading ? "जमा हो रहा है…" : "सदस्यता लें"}
       </button>
     </form>
   );

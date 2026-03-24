@@ -22,7 +22,7 @@ export async function PUT(
     const body = await parseBody(req);
     if (!body) throw new ApiError(400, "Invalid JSON body");
 
-    const { title, description, date, imageUrl } = body;
+    const { title, description, date, location, imageUrl } = body;
 
     const missing: string[] = [];
     if (!title || typeof title !== "string" || !title.trim()) missing.push("title");
@@ -43,12 +43,18 @@ export async function PUT(
 
     await connectDB();
 
+    const loc =
+      location != null && typeof location === "string"
+        ? location.trim().slice(0, 300)
+        : "";
+
     const event = await Event.findByIdAndUpdate(
       id,
       {
         title: (title as string).trim(),
         description: (description as string).trim(),
         date: parsedDate,
+        location: loc,
         imageUrl: (imageUrl as string).trim(),
       },
       { new: true, runValidators: true }

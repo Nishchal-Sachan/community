@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import Matrimony from "@/lib/models/Matrimony";
 import { getUserFromCookie } from "@/lib/user-auth";
 import { ApiError, handleApiError } from "@/lib/api-error";
+import { getMatrimonyViewerContext } from "@/lib/matrimony-access";
 
 // DELETE /api/matrimony/delete/:id — owner only
 export async function DELETE(
@@ -14,6 +15,20 @@ export async function DELETE(
     const payload = await getUserFromCookie();
     if (!payload) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const viewer = await getMatrimonyViewerContext(payload);
+    if (!viewer?.isActiveMember) {
+      return NextResponse.json(
+        { error: "यह सुविधा केवल सदस्यों के लिए उपलब्ध है" },
+        { status: 403 }
+      );
+    }
+    if (!viewer.hasMarriageSubscription) {
+      return NextResponse.json(
+        { error: "Marriage subscription required to delete a profile" },
+        { status: 403 }
+      );
     }
 
     const { id } = await params;

@@ -26,7 +26,7 @@ export default function RegisterPage() {
 
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Registration failed");
+      setError(data.error ?? "पंजीकरण विफल");
       return;
     }
     router.push("/login");
@@ -37,10 +37,10 @@ export default function RegisterPage() {
     <main className="flex min-h-screen items-center justify-center bg-gray-50">
       <Container className="flex flex-col items-center gap-6 py-16">
         <h1 className="font-heading text-2xl font-bold text-gray-900">
-          Create Account
+          खाता बनाएं
         </h1>
         <p className="text-center font-body text-gray-600">
-          Register to join ABKM and access member benefits.
+          ABKM से जुड़ने और सदस्य लाभ प्राप्त करने के लिए पंजीकरण करें।
         </p>
         <form
           onSubmit={handleSubmit}
@@ -54,21 +54,21 @@ export default function RegisterPage() {
           <input
             type="text"
             name="name"
-            placeholder="Full name"
+            placeholder="पूरा नाम"
             required
             className="rounded border border-gray-300 px-4 py-3 font-body"
           />
           <input
             type="email"
             name="email"
-            placeholder="Email"
+            placeholder="ईमेल"
             required
             className="rounded border border-gray-300 px-4 py-3 font-body"
           />
           <input
             type="password"
             name="password"
-            placeholder="Password (min 8 characters)"
+            placeholder="पासवर्ड (कम से कम 8 अक्षर)"
             required
             minLength={8}
             className="rounded border border-gray-300 px-4 py-3 font-body"
@@ -77,13 +77,13 @@ export default function RegisterPage() {
             type="submit"
             className="rounded bg-[#F57C00] px-4 py-3 font-body font-medium text-white transition-colors hover:bg-[#E65100]"
           >
-            Register
+            पंजीकरण करें
           </button>
         </form>
         <p className="text-center font-body text-sm text-gray-500">
-          Already have an account?{" "}
+          पहले से खाता है?{" "}
           <Link href="/login" className="font-medium text-[#F57C00] underline">
-            Log in
+            लॉग इन करें
           </Link>
         </p>
       </Container>

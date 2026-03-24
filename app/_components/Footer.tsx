@@ -39,7 +39,7 @@ function BrandLogo() {
     <Link
       href="/"
       className="flex h-[50px] w-[120px] shrink-0 items-center justify-center rounded border-2 border-[#F57C00] bg-white font-heading text-lg font-bold text-[#F57C00] transition-opacity hover:opacity-90"
-      aria-label="ABKM Home"
+      aria-label="ABKM मुख पृष्ठ"
     >
       ABKM
     </Link>
@@ -68,7 +68,7 @@ export default function Footer() {
           {/* Column 1: About */}
           <div className="min-w-0">
             <h3 className="mb-4 font-heading text-[18px] font-semibold text-white">
-              About
+              हमारे बारे में
             </h3>
             <p className="mb-6 font-body text-[15px] leading-relaxed text-[#94a3b8]">
               {ABOUT}
@@ -84,7 +84,7 @@ export default function Footer() {
           {/* Column 2: Office */}
           <div className="min-w-0">
             <h3 className="mb-4 font-heading text-[18px] font-semibold text-white">
-              Our Office
+              हमारा कार्यालय
             </h3>
             <address className="flex flex-col gap-3 not-italic">
               <p className="font-body text-[15px] leading-relaxed text-[#94a3b8]">
@@ -96,13 +96,13 @@ export default function Footer() {
                 href="mailto:contact@kushwahamahasabha.org"
                 className="font-body text-[15px] text-[#94a3b8] transition-colors hover:text-white"
               >
-                Email: contact@kushwahamahasabha.org
+                ईमेल: contact@kushwahamahasabha.org
               </a>
               <a
                 href="tel:+919839422115"
                 className="font-body text-[15px] text-[#94a3b8] transition-colors hover:text-white"
               >
-                Phone: +91 9839422115
+                फ़ोन: +91 9839422115
               </a>
             </address>
           </div>
@@ -110,7 +110,7 @@ export default function Footer() {
           {/* Column 3: Social */}
           <div className="min-w-0">
             <h3 className="mb-4 font-heading text-[18px] font-semibold text-white">
-              Social
+              सोशल मीडिया
             </h3>
             <div className="flex flex-col items-center gap-4">
               {SOCIAL_LINKS.map(({ label, href, Icon }) => (

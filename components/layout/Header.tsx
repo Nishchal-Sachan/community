@@ -4,20 +4,20 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { JoinLink } from "@/components/JoinLink";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 
 const EMAIL = "contact@kushwahamahasabha.org";
 const PHONE_DISPLAY = "+91 9839422115";
 const PHONE_TEL = "+919839422115";
 
 const NAV_ITEMS = [
-  { href: "/", label: "Home" },
-  { href: "/who-we-are", label: "Who We Are" },
-  { href: "/#services", label: "Services" },
-  { href: "/jobs", label: "Job Portal" },
-  { href: "/matrimony", label: "Matrimony" },
-  { href: "/#gallery", label: "Gallery" },
-  { href: "/#contact", label: "Contact" },
+  { href: "/", label: "मुख्य पृष्ठ" },
+  { href: "/who-we-are", label: "हमारे बारे में" },
+  { href: "/#services", label: "सेवाएं" },
+  { href: "/jobs", label: "रोजगार पोर्टल" },
+  { href: "/matrimony", label: "वैवाहिक" },
+  { href: "/gallery", label: "गैलरी" },
+  { href: "/#contact", label: "संपर्क करें" },
 ] as const;
 
 function LogoMark() {
@@ -31,31 +31,61 @@ function LogoMark() {
   );
 }
 
+function LockIcon({ className }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      width={14}
+      height={14}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      aria-hidden
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+      />
+    </svg>
+  );
+}
+
 function MainNavLink({
   href,
   label,
   onNavigate,
+  suffix,
 }: {
   href: string;
   label: string;
   onNavigate?: () => void;
+  suffix?: ReactNode;
 }) {
   const pathname = usePathname();
   const isHomeActive = href === "/" && pathname === "/";
   const isJobsActive = href === "/jobs" && (pathname === "/jobs" || pathname.startsWith("/jobs/"));
-  const isMatrimonyActive = href === "/matrimony" && (pathname === "/matrimony" || pathname.startsWith("/matrimony/"));
-  const isActive = isHomeActive || isJobsActive || isMatrimonyActive;
+  const isMatrimonyActive =
+    href === "/matrimony" &&
+    (pathname === "/matrimony" ||
+      pathname.startsWith("/matrimony/") ||
+      pathname.startsWith("/marriage/"));
+  const isGalleryActive = href === "/gallery" && pathname === "/gallery";
+  const isActive =
+    isHomeActive || isJobsActive || isMatrimonyActive || isGalleryActive;
 
   return (
     <Link
       href={href}
       onClick={onNavigate}
       className={[
-        "whitespace-nowrap font-body text-[15px] font-normal transition-colors",
+        "inline-flex items-center gap-1 whitespace-nowrap font-body text-[15px] font-normal transition-colors",
         isActive ? "text-[#F57C00]" : "text-[#444] hover:text-[#F57C00]",
       ].join(" ")}
     >
-      {label}
+      <span>{label}</span>
+      {suffix}
     </Link>
   );
 }
@@ -132,15 +162,28 @@ export default function Header() {
           >
             <LogoMark />
             <span className="min-w-0 font-body text-[14px] font-semibold leading-[1.2] text-gray-900">
-              <span className="block">Akhil Bhartiya</span>
-              <span className="block">Kushwaha Mahasabha</span>
+              <span className="block">अखिल भारतीय</span>
+              <span className="block">कुशवाहा महासभा</span>
             </span>
           </Link>
 
           <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary">
-            {NAV_ITEMS.map((item) => (
-              <MainNavLink key={item.href} href={item.href} label={item.label} />
-            ))}
+            {NAV_ITEMS.map((item) => {
+              const jobsLocked =
+                item.href === "/jobs" &&
+                user &&
+                user.membershipStatus !== "active";
+              return (
+                <MainNavLink
+                  key={item.href}
+                  href={item.href}
+                  label={item.label}
+                  suffix={
+                    jobsLocked ? <LockIcon className="shrink-0 text-amber-600" /> : null
+                  }
+                />
+              );
+            })}
             {!loading && (
               user ? (
                 <button
@@ -148,23 +191,23 @@ export default function Header() {
                   onClick={handleLogout}
                   className={joinBtnClass}
                 >
-                  Logout
+                  लॉग आउट
                 </button>
               ) : (
                 <Link href="/login" className={joinBtnClass}>
-                  Login
+                  लॉग इन
                 </Link>
               )
             )}
             <JoinLink className={joinBtnClass}>
-              Join ABKM
+              ABKM से जुड़ें
             </JoinLink>
           </nav>
 
           <button
             type="button"
             onClick={() => setDrawerOpen((o) => !o)}
-            aria-label={drawerOpen ? "Close menu" : "Open menu"}
+            aria-label={drawerOpen ? "मेनू बंद करें" : "मेनू खोलें"}
             aria-expanded={drawerOpen ? "true" : "false"}
             aria-controls="site-drawer"
             className="flex min-h-11 min-w-11 items-center justify-center rounded text-[#444] transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F57C00] focus-visible:ring-offset-2 lg:hidden"
@@ -218,11 +261,11 @@ export default function Header() {
         ].join(" ")}
       >
         <div className="flex h-18 shrink-0 items-center justify-between border-b border-[#eeeeee] px-4">
-          <span className="font-body text-[14px] font-semibold text-gray-900">Menu</span>
+          <span className="font-body text-[14px] font-semibold text-gray-900">मेनू</span>
           <button
             type="button"
             onClick={closeDrawer}
-            aria-label="Close menu"
+            aria-label="मेनू बंद करें"
             className="flex min-h-11 min-w-11 items-center justify-center rounded text-[#444] hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F57C00]"
           >
             <svg
@@ -247,17 +290,24 @@ export default function Header() {
             const isActive =
               (item.href === "/" && pathname === "/") ||
               (item.href === "/jobs" && (pathname === "/jobs" || pathname.startsWith("/jobs/"))) ||
-              (item.href === "/matrimony" && (pathname === "/matrimony" || pathname.startsWith("/matrimony/")));
+              (item.href === "/matrimony" &&
+                (pathname === "/matrimony" ||
+                  pathname.startsWith("/matrimony/") ||
+                  pathname.startsWith("/marriage/"))) ||
+              (item.href === "/gallery" && pathname === "/gallery");
+            const jobsLocked =
+              item.href === "/jobs" && user && user.membershipStatus !== "active";
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={closeDrawer}
-                className={`min-h-11 rounded px-3 py-2.5 font-body text-[14px] transition-colors hover:bg-gray-50 hover:text-[#F57C00] ${
+                className={`flex min-h-11 items-center gap-1.5 rounded px-3 py-2.5 font-body text-[14px] transition-colors hover:bg-gray-50 hover:text-[#F57C00] ${
                   isActive ? "text-[#F57C00]" : "text-[#444]"
                 }`}
               >
-                {item.label}
+                <span>{item.label}</span>
+                {jobsLocked ? <LockIcon className="shrink-0 text-amber-600" /> : null}
               </Link>
             );
           })}
@@ -284,7 +334,7 @@ export default function Header() {
             )
           )}
           <JoinLink className={`${joinBtnClass} w-full`} onClick={closeDrawer}>
-            Join ABKM
+            ABKM से जुड़ें
           </JoinLink>
         </div>
       </div>

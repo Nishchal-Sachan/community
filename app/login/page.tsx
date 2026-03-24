@@ -28,10 +28,10 @@ function LoginForm() {
 
     const data = await res.json();
     if (!res.ok) {
-      setError(data.error ?? "Login failed");
+      setError(data.error ?? "लॉग इन विफल");
       return;
     }
-    let target = data.user?.role === "member" ? "/members" : "/join";
+    let target = "/members";
     if (callbackUrl && callbackUrl.startsWith("/") && !callbackUrl.startsWith("//")) {
       target = callbackUrl;
     }
@@ -43,10 +43,10 @@ function LoginForm() {
     <main className="flex min-h-screen items-center justify-center bg-gray-50">
       <Container className="flex flex-col items-center gap-6 py-16">
         <h1 className="font-heading text-2xl font-bold text-gray-900">
-          Member Login
+          सदस्य लॉग इन
         </h1>
         <p className="text-center font-body text-gray-600">
-          Log in to access the member area and complete your membership.
+          सदस्य क्षेत्र तक पहुँचने और सदस्यता पूरी करने के लिए लॉग इन करें।
         </p>
         <form
           onSubmit={handleSubmit}
@@ -60,7 +60,7 @@ function LoginForm() {
           <input
             type="email"
             name="email"
-            placeholder="Email"
+            placeholder="ईमेल"
             required
             className="rounded border border-gray-300 px-4 py-3 font-body"
           />
@@ -75,7 +75,7 @@ function LoginForm() {
             type="submit"
             className="rounded bg-[#F57C00] px-4 py-3 font-body font-medium text-white transition-colors hover:bg-[#E65100]"
           >
-            Log in
+            लॉग इन
           </button>
         </form>
         <p className="text-center font-body text-sm text-gray-500">
@@ -91,7 +91,7 @@ function LoginForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-gray-50">Loading...</div>}>
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-gray-50">लोड हो रहा है...</div>}>
       <LoginForm />
     </Suspense>
   );

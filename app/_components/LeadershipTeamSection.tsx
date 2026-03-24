@@ -1,8 +1,8 @@
 "use client";
 
-import Image from "next/image";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { leadershipTeam } from "@/data/leadershipTeam";
+import type { LeadershipCard } from "@/lib/site-content-types";
 
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/);
@@ -12,8 +12,22 @@ function getInitials(name: string): string {
   return name.slice(0, 2).toUpperCase();
 }
 
-export default function LeadershipTeamSection() {
+type Props = { cmsCards?: LeadershipCard[] | null };
+
+export default function LeadershipTeamSection({ cmsCards }: Props) {
   const [imageErrors, setImageErrors] = useState<Record<number, boolean>>({});
+
+  const leaders = useMemo(() => {
+    if (cmsCards && cmsCards.length > 0) {
+      return cmsCards.map((c) => ({
+        name: c.name,
+        role: c.role,
+        image: c.image,
+        primary: false as const,
+      }));
+    }
+    return leadershipTeam;
+  }, [cmsCards]);
 
   const handleImageError = (index: number) => {
     setImageErrors((prev) => ({ ...prev, [index]: true }));
@@ -25,7 +39,7 @@ export default function LeadershipTeamSection() {
         {/* HEADER */}
         <div className="mb-16 text-center">
           <p className="mb-2 font-body text-sm uppercase tracking-[0.2em] text-[#F57C00]">
-            Leadership Team
+            नेतृत्व टीम
           </p>
           <h2 className="font-heading text-3xl font-bold text-gray-800 md:text-4xl">
             हमारे नेतृत्वकर्ता
@@ -37,9 +51,9 @@ export default function LeadershipTeamSection() {
 
         {/* GRID */}
         <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-3">
-          {leadershipTeam.map((leader, index) => (
+          {leaders.map((leader, index) => (
             <div
-              key={index}
+              key={`${leader.name}-${index}`}
               className={`group relative rounded-3xl bg-white p-8 text-center shadow-lg transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl ${
                 leader.primary
                   ? "md:col-span-2 lg:col-span-1 lg:scale-[1.05]"
@@ -62,12 +76,11 @@ export default function LeadershipTeamSection() {
                     {getInitials(leader.name)}
                   </div>
                 ) : (
-                  <Image
+                  /* eslint-disable-next-line @next/next/no-img-element */
+                  <img
                     src={leader.image}
                     alt={leader.name}
-                    fill
-                    className="object-cover transition-transform duration-300 group-hover:scale-105"
-                    sizes="160px"
+                    className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                     onError={() => handleImageError(index)}
                   />
                 )}

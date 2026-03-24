@@ -13,10 +13,10 @@ interface CommunityInitiativesSectionProps {
 }
 
 const FALLBACK_INITIATIVES: Initiative[] = [
-  { title: "Youth Development Programs", description: "Supporting skill-building workshops and mentorship initiatives.", icon: "academic" },
-  { title: "Women Empowerment", description: "Promoting entrepreneurship and financial literacy programs.", icon: "users" },
-  { title: "Infrastructure Improvement", description: "Roads, sanitation, and public facilities upgrades.", icon: "tools" },
-  { title: "Health & Awareness Drives", description: "Free medical camps and wellness awareness campaigns.", icon: "heart" },
+  { title: "युवा विकास कार्यक्रम", description: "कौशल निर्माण कार्यशालाओं और मेंटरशिप पहल को सहयोग।", icon: "academic" },
+  { title: "महिला सशक्तिकरण", description: "उद्यमिता और वित्तीय साक्षरता कार्यक्रमों को बढ़ावा।", icon: "users" },
+  { title: "बुनियादी ढाँचे में सुधार", description: "सड़कें, स्वच्छता और सार्वजनिक सुविधाओं का उन्नयन।", icon: "tools" },
+  { title: "स्वास्थ्य एवं जागरूकता अभियान", description: "मुफ्त चिकित्सा शिविर और स्वास्थ्य जागरूकता अभियान।", icon: "heart" },
 ];
 
 export default function CommunityInitiativesSection({
@@ -31,7 +31,7 @@ export default function CommunityInitiativesSection({
       <Container>
         <div className="flex flex-col gap-8">
           <h2 className="text-center font-heading text-4xl font-extrabold tracking-tight text-gray-900">
-            Programs
+            हमारे कार्यक्रम
           </h2>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-4">

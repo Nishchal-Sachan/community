@@ -3,12 +3,18 @@
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
+export type MembershipStatus = "none" | "pending" | "active";
+
+export type MarriageSubscriptionStatus = "none" | "active";
+
 export interface CurrentUser {
   id: string;
   name: string;
   email: string;
   role: string;
   membership: { isPaid: boolean };
+  membershipStatus: MembershipStatus;
+  marriageSubscriptionStatus: MarriageSubscriptionStatus;
 }
 
 interface UseCurrentUserResult {
@@ -28,7 +34,17 @@ export function useCurrentUser(): UseCurrentUserResult {
       const res = await fetch("/api/auth/me", { credentials: "include" });
       if (res.ok) {
         const data = await res.json();
-        setUser(data.user ?? null);
+        const u = data.user;
+        if (u) {
+          setUser({
+            ...u,
+            membershipStatus: u.membershipStatus ?? "none",
+            marriageSubscriptionStatus:
+              u.marriageSubscriptionStatus === "active" ? "active" : "none",
+          });
+        } else {
+          setUser(null);
+        }
       } else {
         setUser(null);
       }

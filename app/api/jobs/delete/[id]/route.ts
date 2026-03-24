@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
 import Job from "@/lib/models/Job";
-import { getUserFromCookie } from "@/lib/user-auth";
+import { requireActiveMember } from "@/lib/require-active-member";
 import { ApiError, handleApiError } from "@/lib/api-error";
 
 // DELETE /api/jobs/delete/:id — owner only
@@ -11,10 +11,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const payload = await getUserFromCookie();
-    if (!payload) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+    const gate = await requireActiveMember();
+    if (!gate.ok) return gate.response;
+    const { payload } = gate;
 
     const { id } = await params;
     if (!id || !mongoose.isValidObjectId(id)) {

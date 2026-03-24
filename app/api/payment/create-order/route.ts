@@ -1,11 +1,10 @@
 import { NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import { getUserFromCookie } from "@/lib/user-auth";
+import { MEMBERSHIP_AMOUNT_PAISE } from "@/lib/payment-plans";
 
 const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 const RAZORPAY_SECRET = process.env.RAZORPAY_SECRET;
-
-const MEMBERSHIP_AMOUNT_PAISE = 1000; // ₹10 in paise
 
 // POST /api/payment/create-order
 export async function POST() {

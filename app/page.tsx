@@ -1,46 +1,45 @@
-import { Suspense } from "react";
-import HomeContentSections from "./_components/HomeContentSections";
-import Footer from "./_components/Footer";
 import FullWidthCTASection from "./_components/FullWidthCTASection";
+import Footer from "./_components/Footer";
+import HeroSection from "./_components/HeroSection";
+import HomepageServicesSection from "./_components/HomepageServicesSection";
 import LeadershipSection from "./_components/LeadershipSection";
 import LeadershipTeamSection from "./_components/LeadershipTeamSection";
 import OurGoalSection from "./_components/OurGoalSection";
-import OurServicesSection from "./_components/OurServicesSection";
+import {
+  ctaSlidesFromContent,
+  getMergedSiteContent,
+  heroForBanner,
+  leadershipCardsFromContent,
+  servicesFromContent,
+} from "@/lib/get-site-content";
 
-function HeroLoadingFallback() {
-  return (
-    <div className="flex h-[90vh] min-h-[22rem] w-full items-center bg-secondary">
-      <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="max-w-3xl space-y-4">
-          <div className="h-12 w-4/5 max-w-md animate-pulse rounded-md bg-on-primary/20 md:h-16" />
-          <div className="h-6 w-full max-w-lg animate-pulse rounded-md bg-on-primary/15 md:h-7" />
-          <div className="h-10 w-40 animate-pulse rounded-md bg-primary/40" />
-        </div>
-      </div>
-    </div>
-  );
-}
+export const dynamic = "force-dynamic";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const content = await getMergedSiteContent();
+  const hero = heroForBanner(content.hero);
+  const ctaSlides = ctaSlidesFromContent(content.cta);
+  const leadershipCms = leadershipCardsFromContent(content.leadership);
+  const services = servicesFromContent(content.services);
+
   return (
     <main className="min-h-screen overflow-x-hidden">
-      <Suspense fallback={<HeroLoadingFallback />}>
-        <HomeContentSections />
-      </Suspense>
+      <HeroSection hero={hero} />
 
       <LeadershipSection />
 
-      <LeadershipTeamSection />
+      <LeadershipTeamSection cmsCards={leadershipCms} />
 
       <OurGoalSection />
 
-      <OurServicesSection />
+      <HomepageServicesSection
+        title={services.title}
+        descriptions={services.descriptions}
+      />
 
-      <FullWidthCTASection />
+      <FullWidthCTASection slides={ctaSlides} />
 
-      <Suspense fallback={<div className="h-64 bg-gray-950" />}>
-        <Footer />
-      </Suspense>
+      <Footer />
     </main>
   );
 }

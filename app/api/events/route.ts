@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
 
     const events = await Event.find()
       .sort({ date: 1 })
-      .select("title description date imageUrl createdAt")
+      .select("title description date location imageUrl createdAt")
       .lean();
 
     return NextResponse.json({ events });
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     const body = await parseBody(req);
     if (!body) throw new ApiError(400, "Invalid JSON body");
 
-    const { title, description, date, imageUrl } = body;
+    const { title, description, date, location, imageUrl } = body;
 
     // ── Presence checks ────────────────────────────────────────────────────
     const missing: string[] = [];
@@ -54,10 +54,16 @@ export async function POST(req: NextRequest) {
 
     await connectDB();
 
+    const loc =
+      location != null && typeof location === "string"
+        ? location.trim().slice(0, 300)
+        : "";
+
     const event = await Event.create({
       title: (title as string).trim(),
       description: (description as string).trim(),
       date: parsedDate,
+      location: loc,
       imageUrl: (imageUrl as string).trim(),
     });
 

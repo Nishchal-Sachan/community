@@ -1,10 +1,11 @@
 /**
- * One-time script to seed the initial admin user.
+ * Seeds the admin user: deletes all documents in the `admins` collection, then
+ * creates one account (see credentials in `main()`).
  *
  * Usage:
  *   npx tsx scripts/seed-admin.ts
  *
- * Make sure DATABASE_URL or MONGODB_URI is set in .env.local before running.
+ * Make sure DATABASE_URL or MONGODB_URI is set in .env or .env.local.
  */
 
 import mongoose from "mongoose";
@@ -12,11 +13,12 @@ import bcrypt from "bcryptjs";
 import * as dotenv from "dotenv";
 import path from "path";
 
-dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
+const envPaths = [".env", ".env.local"];
+envPaths.forEach((envFile) => dotenv.config({ path: path.resolve(process.cwd(), envFile) }));
 
 const MONGODB_URI = process.env.DATABASE_URL ?? process.env.MONGODB_URI;
 if (!MONGODB_URI) {
-  console.error("ERROR: DATABASE_URL or MONGODB_URI is not defined in .env.local");
+  console.error("ERROR: DATABASE_URL or MONGODB_URI is not defined in .env or .env.local");
   process.exit(1);
 }
 
@@ -32,28 +34,21 @@ const AdminSchema = new mongoose.Schema(
 const Admin = mongoose.models.Admin ?? mongoose.model("Admin", AdminSchema);
 
 async function main() {
-  // --- Configure these before running ---
-  const ADMIN_EMAIL = "admin@example.com";
-  const ADMIN_PASSWORD = "ChangeMe123!";
-  // --------------------------------------
+  const ADMIN_EMAIL = "sachannishchal@gmail.com";
+  const ADMIN_PASSWORD = "Nishchal@admin123";
 
   await mongoose.connect(MONGODB_URI as string);
   console.log("Connected to MongoDB");
 
-  const exists = await Admin.findOne({ email: ADMIN_EMAIL });
-  if (exists) {
-    console.log(`Admin with email "${ADMIN_EMAIL}" already exists. Skipping.`);
-    await mongoose.disconnect();
-    return;
-  }
+  const removed = await Admin.deleteMany({});
+  console.log(`Removed ${removed.deletedCount} existing admin account(s).`);
 
   const hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, 12);
-  await Admin.create({ email: ADMIN_EMAIL, password: hashedPassword });
+  await Admin.create({ email: ADMIN_EMAIL.toLowerCase().trim(), password: hashedPassword });
 
-  console.log(`Admin created successfully:`);
+  console.log("Admin created successfully:");
   console.log(`  Email:    ${ADMIN_EMAIL}`);
   console.log(`  Password: ${ADMIN_PASSWORD}`);
-  console.log("\nIMPORTANT: Change the password after first login.");
 
   await mongoose.disconnect();
 }

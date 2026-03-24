@@ -1,7 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { PaymentReceiptPreviewModal } from "@/components/payment/PaymentReceiptPreviewModal";
+import { PaymentSuccessModal } from "@/components/payment/PaymentSuccessModal";
+import type { ClientReceipt } from "@/lib/payment-receipt-types";
+import {
+  MEMBERSHIP_DISPLAY_RUPEES,
+  MEMBERSHIP_PLAN_LABEL_HI,
+} from "@/lib/payment-plans";
 
 declare global {
   interface Window {
@@ -30,26 +37,61 @@ interface RazorpayInstance {
   open: () => void;
 }
 
+async function loadRazorpayScript(): Promise<void> {
+  return new Promise((resolve) => {
+    if (window.Razorpay) {
+      resolve();
+      return;
+    }
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve();
+    document.body.appendChild(script);
+  });
+}
+
 export function PaymentButton() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewDateLabel, setPreviewDateLabel] = useState("");
+  const [me, setMe] = useState<{ name: string; email: string } | null>(null);
+  const [meLoading, setMeLoading] = useState(false);
+  const [successReceipt, setSuccessReceipt] = useState<ClientReceipt | null>(null);
 
-  async function loadRazorpayScript(): Promise<void> {
-    return new Promise((resolve) => {
-      if (window.Razorpay) {
-        resolve();
-        return;
+  useEffect(() => {
+    if (!previewOpen) return;
+    setPreviewDateLabel(
+      new Date().toLocaleDateString("hi-IN", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+    );
+    let cancelled = false;
+    (async () => {
+      setMeLoading(true);
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        const data = await res.json();
+        if (!cancelled && res.ok && data.user) {
+          setMe({
+            name: String(data.user.name ?? ""),
+            email: String(data.user.email ?? ""),
+          });
+        }
+      } finally {
+        if (!cancelled) setMeLoading(false);
       }
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.async = true;
-      script.onload = () => resolve();
-      document.body.appendChild(script);
-    });
-  }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [previewOpen]);
 
-  async function handlePay() {
+  const startGateway = useCallback(async () => {
     setLoading(true);
     setError(null);
 
@@ -81,7 +123,7 @@ export function PaymentButton() {
         amount,
         currency: currency ?? "INR",
         name: "Akhil Bhartiya Kushwaha Mahasabha",
-        description: "Membership Fee",
+        description: "सदस्यता शुल्क",
         modal: {
           ondismiss: () => setLoading(false),
         },
@@ -104,10 +146,16 @@ export function PaymentButton() {
               throw new Error(verifyData.error ?? "Payment verification failed");
             }
 
-            router.push("/members");
-            router.refresh();
+            setPreviewOpen(false);
+            if (verifyData.receipt) {
+              setSuccessReceipt(verifyData.receipt as ClientReceipt);
+            } else {
+              router.push("/members");
+              router.refresh();
+            }
           } catch (err) {
             setError(err instanceof Error ? err.message : "Verification failed");
+          } finally {
             setLoading(false);
           }
         },
@@ -119,7 +167,7 @@ export function PaymentButton() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [router]);
 
   return (
     <div className="mt-8">
@@ -128,14 +176,44 @@ export function PaymentButton() {
           {error}
         </p>
       )}
+
+      <PaymentReceiptPreviewModal
+        open={previewOpen}
+        onClose={() => !loading && setPreviewOpen(false)}
+        fullName={me?.name ?? ""}
+        email={me?.email ?? ""}
+        planLabelHi={MEMBERSHIP_PLAN_LABEL_HI}
+        amountRupees={MEMBERSHIP_DISPLAY_RUPEES}
+        previewDateLabel={previewDateLabel}
+        onContinue={() => {
+          if (meLoading) return;
+          void startGateway();
+        }}
+        continueLoading={loading || meLoading}
+      />
+
+      <PaymentSuccessModal
+        open={Boolean(successReceipt)}
+        receipt={successReceipt}
+        onDone={() => {
+          setSuccessReceipt(null);
+          router.push("/members");
+          router.refresh();
+        }}
+        doneLabel="सदस्य पोर्टल पर जाएं"
+      />
+
       <button
         type="button"
-        onClick={handlePay}
+        onClick={() => setPreviewOpen(true)}
         disabled={loading}
         className="w-full rounded-md bg-[#F57C00] px-6 py-4 font-body text-lg font-semibold text-white transition-colors hover:bg-[#E65100] disabled:opacity-70 focus:outline-none focus:ring-2 focus:ring-[#F57C00] focus:ring-offset-2"
       >
-        {loading ? "Opening..." : "Pay ₹10"}
+        {loading ? "खुल रहा है..." : "सदस्य बनें"}
       </button>
+      <p className="mt-2 text-center font-body text-sm text-gray-600">
+        सदस्यता शुल्क: ₹{MEMBERSHIP_DISPLAY_RUPEES}
+      </p>
     </div>
   );
 }

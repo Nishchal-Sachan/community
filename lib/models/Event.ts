@@ -4,6 +4,7 @@ export interface IEvent extends Document {
   title: string;
   description: string;
   date: Date;
+  location: string;
   imageUrl: string;
   createdAt: Date;
 }
@@ -27,6 +28,12 @@ const EventSchema = new Schema<IEvent>(
     date: {
       type: Date,
       required: [true, "Event date is required"],
+    },
+    location: {
+      type: String,
+      trim: true,
+      maxlength: [300, "Location is too long"],
+      default: "",
     },
     imageUrl: {
       type: String,

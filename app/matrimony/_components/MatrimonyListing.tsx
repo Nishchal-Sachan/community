@@ -1,51 +1,75 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { MatrimonyPostForm } from "../post/_components/MatrimonyPostForm";
-import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { MatrimonyPostForm, type MatrimonyFormData } from "../post/_components/MatrimonyPostForm";
+import { MarriageSubscribeButton } from "./MarriageSubscribeButton";
 
-interface MatrimonyProfile {
+interface ListProfile {
   id: string;
-  createdBy: string;
   fullName: string;
-  age: number;
-  gender: string;
-  profilePhotoUrl: string;
-  height: string;
-  maritalStatus: string;
-  religion: string;
-  caste: string;
-  education: string;
   profession: string;
-  income: string;
-  location: string;
-  about: string;
-  contactName: string;
-  contactPhone: string;
-  contactEmail: string;
-  createdAt: string;
+  profilePhotoUrl: string;
+  isOwner: boolean;
 }
 
-const ABOUT_MAX_LENGTH = 120;
-
-function truncate(text: string, max: number): string {
-  if (text.length <= max) return text;
-  return text.slice(0, max).trim() + "…";
+interface FullProfileResponse {
+  restricted: boolean;
+  profile: Record<string, unknown>;
 }
 
-export function MatrimonyListing() {
-  const { user } = useCurrentUser();
-  const [profiles, setProfiles] = useState<MatrimonyProfile[]>([]);
+function toFormDataFromApi(p: Record<string, unknown>): MatrimonyFormData {
+  const gallery =
+    Array.isArray(p.galleryUrls) && p.galleryUrls.length > 0
+      ? (p.galleryUrls as string[]).filter(Boolean).slice(0, 4)
+      : typeof p.profilePhotoUrl === "string" && p.profilePhotoUrl
+        ? [p.profilePhotoUrl]
+        : [];
+
+  return {
+    fullName: String(p.fullName ?? ""),
+    age: typeof p.age === "number" ? p.age : parseInt(String(p.age ?? ""), 10) || 18,
+    gender: p.gender === "female" ? "female" : "male",
+    galleryUrls: gallery,
+    height: String(p.height ?? ""),
+    maritalStatus: String(p.maritalStatus ?? ""),
+    religion: String(p.religion ?? ""),
+    caste: String(p.caste ?? ""),
+    education: String(p.education ?? ""),
+    profession: String(p.profession ?? ""),
+    income: String(p.income ?? ""),
+    location: String(p.location ?? ""),
+    about: String(p.about ?? ""),
+    contactName: String(p.contactName ?? ""),
+    contactPhone: String(p.contactPhone ?? ""),
+    contactEmail: String(p.contactEmail ?? ""),
+  };
+}
+
+export function MatrimonyListing({
+  marriageSubscriptionActive,
+}: {
+  marriageSubscriptionActive: boolean;
+}) {
+  const [profiles, setProfiles] = useState<ListProfile[]>([]);
   const [loading, setLoading] = useState(true);
-  const [editingProfile, setEditingProfile] = useState<MatrimonyProfile | null>(null);
+  const [membersOnly, setMembersOnly] = useState(false);
+  const [editingProfile, setEditingProfile] = useState<MatrimonyFormData | null>(null);
+  const [editingProfileId, setEditingProfileId] = useState<string | null>(null);
   const [deletingProfileId, setDeletingProfileId] = useState<string | null>(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const fetchProfiles = useCallback(async () => {
     setLoading(true);
+    setMembersOnly(false);
     try {
-      const res = await fetch("/api/matrimony/list");
+      const res = await fetch("/api/matrimony/list", { credentials: "include" });
       const data = await res.json();
+      if (res.status === 403 && data.code === "MEMBERS_ONLY") {
+        setMembersOnly(true);
+        setProfiles([]);
+        return;
+      }
       setProfiles(Array.isArray(data.profiles) ? data.profiles : []);
     } catch {
       setProfiles([]);
@@ -57,6 +81,21 @@ export function MatrimonyListing() {
   useEffect(() => {
     fetchProfiles();
   }, [fetchProfiles]);
+
+  async function openEdit(listItem: ListProfile) {
+    if (!marriageSubscriptionActive || !listItem.isOwner) return;
+    try {
+      const res = await fetch(`/api/matrimony/profile/${listItem.id}`, {
+        credentials: "include",
+      });
+      const data = (await res.json()) as FullProfileResponse;
+      if (!res.ok || data.restricted || !data.profile) return;
+      setEditingProfileId(listItem.id);
+      setEditingProfile(toFormDataFromApi(data.profile));
+    } catch {
+      /* ignore */
+    }
+  }
 
   async function handleDelete(profileId: string) {
     setDeleteLoading(true);
@@ -78,152 +117,150 @@ export function MatrimonyListing() {
 
   function handleEditSuccess() {
     setEditingProfile(null);
+    setEditingProfileId(null);
     fetchProfiles();
+  }
+
+  if (membersOnly) {
+    return (
+      <div className="rounded-lg border border-gray-300 bg-white px-6 py-12 text-center font-body text-gray-800 shadow-sm">
+        <p className="text-lg">यह सुविधा केवल सदस्यों के लिए उपलब्ध है</p>
+      </div>
+    );
   }
 
   return (
     <div className="flex flex-col gap-6">
+      {!marriageSubscriptionActive && (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 font-body text-sm text-amber-950">
+          <p className="font-medium">पूर्ण प्रोफ़ाइल देखने के लिए विवाह सदस्यता आवश्यक है</p>
+        </div>
+      )}
+
       {loading ? (
-        <div className="rounded-[12px] border border-[#eeeeee] bg-white px-6 py-12 text-center font-body text-gray-500 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
-          Loading...
+        <div className="rounded-lg border border-gray-300 bg-white px-6 py-12 text-center font-body text-gray-500 shadow-sm">
+          लोड हो रहा है...
         </div>
       ) : profiles.length === 0 ? (
-        <div className="rounded-[12px] border border-[#eeeeee] bg-white px-6 py-12 text-center font-body text-gray-500 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
-          No profiles found.
+        <div className="rounded-lg border border-gray-300 bg-white px-6 py-12 text-center font-body text-gray-500 shadow-sm">
+          कोई प्रोफाइल नहीं मिली।
         </div>
       ) : (
-        <div className="grid min-w-0 grid-cols-1 gap-5 sm:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {profiles.map((profile) => (
-            <article
+            <li
               key={profile.id}
-              className="rounded-[12px] border border-[#eeeeee] bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-shadow hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)] overflow-hidden"
+              className="flex flex-col overflow-hidden rounded-lg border border-gray-300 bg-white shadow-sm"
             >
-              <div className="aspect-[4/3] w-full bg-gray-100">
+              <div className="flex h-28 shrink-0 bg-gray-100">
                 {profile.profilePhotoUrl ? (
-                  <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={profile.profilePhotoUrl}
-                      alt={profile.fullName}
-                      className="h-full w-full object-cover"
-                    />
-                  </>
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={profile.profilePhotoUrl}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
                 ) : (
-                  <div className="flex h-full w-full items-center justify-center text-4xl text-gray-400">
+                  <div className="flex h-full w-full items-center justify-center font-heading text-2xl text-gray-400">
                     {profile.fullName.charAt(0).toUpperCase()}
                   </div>
                 )}
               </div>
-              <div className="p-5 sm:p-6">
-                <h3 className="mb-1 font-heading text-[18px] font-semibold text-gray-900">
-                  {profile.fullName}, {profile.age}
+              <div className="flex flex-1 flex-col gap-2 p-3">
+                <h3 className="font-heading text-base font-semibold leading-snug text-gray-900 line-clamp-2">
+                  {profile.fullName}
                 </h3>
-                <p className="mb-2 font-body text-[14px] text-gray-500">
-                  {profile.profession}
-                  {profile.location ? ` · ${profile.location}` : ""}
-                </p>
-                <p className="mb-4 font-body text-[14px] leading-[1.7] text-[#555555]">
-                  {truncate(profile.about, ABOUT_MAX_LENGTH)}
-                </p>
-                <div className="space-y-1.5 border-t border-gray-100 pt-4 font-body text-[14px] text-[#555555]">
-                  <a
-                    href={`tel:${profile.contactPhone.replace(/\s/g, "")}`}
-                    className="block text-[#F57C00] hover:underline"
+                <p className="font-body text-sm text-gray-600 line-clamp-2">{profile.profession}</p>
+                <div className="mt-auto flex flex-wrap gap-2 pt-1">
+                  <Link
+                    href={`/matrimony/profile/${profile.id}`}
+                    className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded border border-gray-400 bg-white px-3 py-2 text-center font-body text-sm font-medium text-gray-800 hover:bg-gray-50"
                   >
-                    {profile.contactPhone}
-                  </a>
-                  <a
-                    href={`mailto:${profile.contactEmail}`}
-                    className="block text-[#F57C00] hover:underline"
-                  >
-                    {profile.contactEmail}
-                  </a>
+                    विवरण देखें
+                  </Link>
+                  {marriageSubscriptionActive && profile.isOwner && (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => openEdit(profile)}
+                        className="rounded border border-gray-300 px-3 py-2 font-body text-sm text-gray-700 hover:bg-gray-50"
+                      >
+                        संपादित करें
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setDeletingProfileId(profile.id)}
+                        className="rounded border border-red-200 bg-red-50 px-3 py-2 font-body text-sm text-red-800 hover:bg-red-100"
+                      >
+                        हटाएं
+                      </button>
+                    </>
+                  )}
                 </div>
-                {user && profile.createdBy === user.id && (
-                  <div className="mt-4 flex flex-wrap gap-2 border-t border-gray-100 pt-4">
-                    <button
-                      type="button"
-                      onClick={() => setEditingProfile(profile)}
-                      className="rounded-md border border-gray-300 px-3 py-1.5 font-body text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#F57C00] focus:ring-offset-1"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setDeletingProfileId(profile.id)}
-                      className="rounded-md border border-red-300 bg-red-50 px-3 py-1.5 font-body text-sm font-medium text-red-700 transition-colors hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
               </div>
-            </article>
+            </li>
           ))}
+        </ul>
+      )}
+
+      {!marriageSubscriptionActive && (
+        <div className="rounded-lg border border-gray-300 bg-white p-6 text-center shadow-sm">
+          <p className="mb-4 font-body text-sm text-gray-800">
+            विवाह प्रोफ़ाइल की पूरी जानकारी देखने के लिए सदस्यता लें
+          </p>
+          <MarriageSubscribeButton />
         </div>
       )}
 
-      {/* Edit modal */}
-      {editingProfile && (
+      {editingProfile && editingProfileId && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={() => setEditingProfile(null)}
+          onClick={() => {
+            setEditingProfile(null);
+            setEditingProfileId(null);
+          }}
         >
           <div
-            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-[12px] border border-gray-200 bg-white p-6 shadow-xl"
+            className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg border border-gray-200 bg-white p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-heading text-xl font-semibold text-gray-900">
-                Edit Profile
+                प्रोफाइल संपादित करें
               </h2>
               <button
                 type="button"
-                onClick={() => setEditingProfile(null)}
+                onClick={() => {
+                  setEditingProfile(null);
+                  setEditingProfileId(null);
+                }}
                 className="rounded p-1 text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-                aria-label="Close"
+                aria-label="बंद करें"
               >
                 ×
               </button>
             </div>
             <MatrimonyPostForm
-              profileId={editingProfile.id}
-              initialData={{
-                fullName: editingProfile.fullName,
-                age: editingProfile.age,
-                gender: editingProfile.gender as "male" | "female",
-                profilePhotoUrl: editingProfile.profilePhotoUrl,
-                height: editingProfile.height,
-                maritalStatus: editingProfile.maritalStatus,
-                religion: editingProfile.religion,
-                caste: editingProfile.caste,
-                education: editingProfile.education,
-                profession: editingProfile.profession,
-                income: editingProfile.income,
-                location: editingProfile.location,
-                about: editingProfile.about,
-                contactName: editingProfile.contactName,
-                contactPhone: editingProfile.contactPhone,
-                contactEmail: editingProfile.contactEmail,
-              }}
+              key={editingProfileId}
+              profileId={editingProfileId}
+              initialData={editingProfile}
               onSuccess={handleEditSuccess}
             />
           </div>
         </div>
       )}
 
-      {/* Delete confirm dialog */}
       {deletingProfileId && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
           onClick={() => setDeletingProfileId(null)}
         >
           <div
-            className="w-full max-w-sm rounded-[12px] border border-gray-200 bg-white p-6 shadow-xl"
+            className="w-full max-w-sm rounded-lg border border-gray-200 bg-white p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
             <p className="mb-6 font-body text-gray-700">
-              Are you sure you want to remove this profile?
+              क्या आप वाकई इस प्रोफाइल को हटाना चाहते हैं?
             </p>
             <div className="flex justify-end gap-3">
               <button
@@ -231,7 +268,7 @@ export function MatrimonyListing() {
                 onClick={() => setDeletingProfileId(null)}
                 className="rounded-md border border-gray-300 px-4 py-2 font-body text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
-                Cancel
+                रद्द करें
               </button>
               <button
                 type="button"
@@ -239,7 +276,7 @@ export function MatrimonyListing() {
                 disabled={deleteLoading}
                 className="rounded-md bg-red-600 px-4 py-2 font-body text-sm font-medium text-white hover:bg-red-700 disabled:opacity-70"
               >
-                {deleteLoading ? "Deleting..." : "Delete"}
+                {deleteLoading ? "हटाया जा रहा है..." : "हटाएं"}
               </button>
             </div>
           </div>

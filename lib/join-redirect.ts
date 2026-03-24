@@ -12,6 +12,5 @@ export interface AuthUser {
 
 export function getJoinRedirect(user: AuthUser | null): string {
   if (!user) return "/login";
-  if (user.role === "member") return "/members";
-  return "/join";
+  return "/members";
 }

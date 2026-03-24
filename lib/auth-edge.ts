@@ -1,5 +1,5 @@
 /**
- * Edge-compatible JWT verification for middleware.
+ * Edge-compatible JWT verification for the Next.js `proxy` (edge auth gate).
  * Uses jose (Web Crypto) instead of jsonwebtoken (Node crypto).
  */
 import { jwtVerify } from "jose";

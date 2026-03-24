@@ -11,11 +11,6 @@ interface MembersPortalContentProps {
 export function MembersPortalContent({ isMember }: MembersPortalContentProps) {
   const [showForm, setShowForm] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   useEffect(() => {
     if (!showForm) return;
@@ -120,10 +115,7 @@ export function MembersPortalContent({ isMember }: MembersPortalContentProps) {
         </div>
       </div>
 
-      {mounted &&
-        typeof document !== "undefined" &&
-        modalContent &&
-        createPortal(modalContent, document.body)}
+      {showForm && modalContent && createPortal(modalContent, document.body)}
     </>
   );
 }

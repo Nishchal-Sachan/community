@@ -1,5 +1,5 @@
 /**
- * Edge-compatible JWT verification for user auth (middleware).
+ * Edge-compatible JWT verification for user auth in the Next.js `proxy`.
  */
 import { jwtVerify } from "jose";
 

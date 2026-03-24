@@ -39,21 +39,12 @@ const SLIDE_INTERVAL_MS = 4000;
 
 type Props = { slides?: CtaSlide[] | null };
 
-export default function FullWidthCTASection({ slides: slidesProp }: Props) {
-  const slides = useMemo((): readonly CtaSlide[] => {
-    if (slidesProp && slidesProp.length > 0) return slidesProp;
-    return DEFAULT_SLIDES;
-  }, [slidesProp]);
-
+function CTACarousel({ slides }: { slides: readonly CtaSlide[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
 
   const goToSlide = useCallback((index: number) => {
     setActiveIndex(index);
   }, []);
-
-  useEffect(() => {
-    setActiveIndex(0);
-  }, [slides]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -139,4 +130,15 @@ export default function FullWidthCTASection({ slides: slidesProp }: Props) {
       </div>
     </section>
   );
+}
+
+export default function FullWidthCTASection({ slides: slidesProp }: Props) {
+  const slides = useMemo((): readonly CtaSlide[] => {
+    if (slidesProp && slidesProp.length > 0) return slidesProp;
+    return DEFAULT_SLIDES;
+  }, [slidesProp]);
+
+  const deckKey = useMemo(() => slides.map((s) => s.id).join("|"), [slides]);
+
+  return <CTACarousel key={deckKey} slides={slides} />;
 }

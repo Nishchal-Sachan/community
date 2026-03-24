@@ -85,7 +85,7 @@ async function main() {
   );
   console.log(`User "${TARGET_EMAIL}" updated to paid member.${wasMember ? " (was already member)" : ""}`);
 
-  let memberExists = await Member.findOne({ name: MEMBER_NAME, phone: MEMBER_PHONE });
+  const memberExists = await Member.findOne({ name: MEMBER_NAME, phone: MEMBER_PHONE });
   if (!memberExists) {
     await Member.create({
       name: MEMBER_NAME,

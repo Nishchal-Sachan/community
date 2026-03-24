@@ -93,7 +93,7 @@ export async function GET(req: NextRequest) {
       joinedAt?: Date;
     };
 
-    let emailByUserId = new Map<string, string>();
+    const emailByUserId = new Map<string, string>();
     if (fullAccess && members.length > 0) {
       const ids = [
         ...new Set(

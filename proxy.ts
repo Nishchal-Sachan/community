@@ -53,9 +53,9 @@ export const config = {
   ],
 };
 
-// ─── Middleware ──────────────────────────────────────────────────────────────
+// ─── Proxy (auth gate before routes) ─────────────────────────────────────────
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Protected routes: user auth required

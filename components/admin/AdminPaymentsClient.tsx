@@ -50,8 +50,16 @@ export default function AdminPaymentsClient() {
     <div className="space-y-4">
       <div className="flex flex-wrap items-end gap-3 border border-gray-300 bg-white p-3">
         <div>
-          <label className="block text-xs text-gray-600">Plan</label>
+          <label
+            id="admin-payments-plan-label"
+            htmlFor="admin-payments-plan"
+            className="block text-xs text-gray-600"
+          >
+            Plan
+          </label>
           <select
+            id="admin-payments-plan"
+            aria-labelledby="admin-payments-plan-label"
             value={plan}
             onChange={(e) => setPlan(e.target.value)}
             className="mt-0.5 border border-gray-300 px-2 py-1 text-sm"
@@ -62,8 +70,11 @@ export default function AdminPaymentsClient() {
           </select>
         </div>
         <div>
-          <label className="block text-xs text-gray-600">From</label>
+          <label htmlFor="admin-payments-from" className="block text-xs text-gray-600">
+            From
+          </label>
           <input
+            id="admin-payments-from"
             type="date"
             value={from}
             onChange={(e) => setFrom(e.target.value)}
@@ -71,8 +82,11 @@ export default function AdminPaymentsClient() {
           />
         </div>
         <div>
-          <label className="block text-xs text-gray-600">To</label>
+          <label htmlFor="admin-payments-to" className="block text-xs text-gray-600">
+            To
+          </label>
           <input
+            id="admin-payments-to"
             type="date"
             value={to}
             onChange={(e) => setTo(e.target.value)}
@@ -93,7 +107,7 @@ export default function AdminPaymentsClient() {
 
       {!loading && !error && (
         <div className="overflow-x-auto border border-gray-300 bg-white">
-          <table className="w-full min-w-[900px] border-collapse text-left text-sm">
+          <table className="w-full min-w-225 border-collapse text-left text-sm">
             <thead>
               <tr className="border-b border-gray-300 bg-gray-50">
                 <th className="border-b border-gray-300 px-3 py-2 font-medium">Name</th>

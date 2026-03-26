@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useRef, useEffect, useCallback } from "react";
 import { MATRIMONY_MAX_GALLERY } from "@/lib/matrimony-profile";
+import { useRouter } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const HEIGHTS = [
   "4'10\" (147 cm)",
@@ -50,13 +50,19 @@ function galleryFromInitial(initial?: MatrimonyFormData): string[] {
   return [];
 }
 
-export function MatrimonyPostForm({ initialData, profileId, onSuccess }: MatrimonyPostFormProps) {
+export function MatrimonyPostForm({
+  initialData,
+  profileId,
+  onSuccess,
+}: MatrimonyPostFormProps) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [galleryUrls, setGalleryUrls] = useState<string[]>(() => galleryFromInitial(initialData));
+  const [galleryUrls, setGalleryUrls] = useState<string[]>(() =>
+    galleryFromInitial(initialData),
+  );
   const isEdit = Boolean(profileId && initialData);
 
   const syncGalleryFromInitial = useCallback(() => {
@@ -73,7 +79,11 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
     setUploading(true);
     try {
       let next = [...galleryUrls];
-      for (let i = 0; i < files.length && next.length < MATRIMONY_MAX_GALLERY; i++) {
+      for (
+        let i = 0;
+        i < files.length && next.length < MATRIMONY_MAX_GALLERY;
+        i++
+      ) {
         const file = files[i];
         const formData = new FormData();
         formData.append("photo", file);
@@ -112,26 +122,59 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
 
     const form = e.currentTarget;
     const data = {
-      fullName: (form.elements.namedItem("fullName") as HTMLInputElement).value.trim(),
-      age: parseInt((form.elements.namedItem("age") as HTMLInputElement).value, 10),
-      gender: (form.elements.namedItem("gender") as HTMLSelectElement).value as "male" | "female",
+      fullName: (
+        form.elements.namedItem("fullName") as HTMLInputElement
+      ).value.trim(),
+      age: parseInt(
+        (form.elements.namedItem("age") as HTMLInputElement).value,
+        10,
+      ),
+      gender: (form.elements.namedItem("gender") as HTMLSelectElement).value as
+        | "male"
+        | "female",
       galleryUrls,
-      height: (form.elements.namedItem("height") as HTMLSelectElement).value.trim(),
-      maritalStatus: (form.elements.namedItem("maritalStatus") as HTMLSelectElement).value.trim(),
-      religion: (form.elements.namedItem("religion") as HTMLInputElement).value.trim(),
-      caste: (form.elements.namedItem("caste") as HTMLInputElement).value.trim(),
-      education: (form.elements.namedItem("education") as HTMLInputElement).value.trim(),
-      profession: (form.elements.namedItem("profession") as HTMLInputElement).value.trim(),
-      income: (form.elements.namedItem("income") as HTMLInputElement).value.trim(),
-      location: (form.elements.namedItem("location") as HTMLInputElement).value.trim(),
-      about: (form.elements.namedItem("about") as HTMLTextAreaElement).value.trim(),
-      contactName: (form.elements.namedItem("contactName") as HTMLInputElement).value.trim(),
-      contactPhone: (form.elements.namedItem("contactPhone") as HTMLInputElement).value.trim(),
-      contactEmail: (form.elements.namedItem("contactEmail") as HTMLInputElement).value.trim(),
+      height: (
+        form.elements.namedItem("height") as HTMLSelectElement
+      ).value.trim(),
+      maritalStatus: (
+        form.elements.namedItem("maritalStatus") as HTMLSelectElement
+      ).value.trim(),
+      religion: (
+        form.elements.namedItem("religion") as HTMLInputElement
+      ).value.trim(),
+      caste: (
+        form.elements.namedItem("caste") as HTMLInputElement
+      ).value.trim(),
+      education: (
+        form.elements.namedItem("education") as HTMLInputElement
+      ).value.trim(),
+      profession: (
+        form.elements.namedItem("profession") as HTMLInputElement
+      ).value.trim(),
+      income: (
+        form.elements.namedItem("income") as HTMLInputElement
+      ).value.trim(),
+      location: (
+        form.elements.namedItem("location") as HTMLInputElement
+      ).value.trim(),
+      about: (
+        form.elements.namedItem("about") as HTMLTextAreaElement
+      ).value.trim(),
+      contactName: (
+        form.elements.namedItem("contactName") as HTMLInputElement
+      ).value.trim(),
+      contactPhone: (
+        form.elements.namedItem("contactPhone") as HTMLInputElement
+      ).value.trim(),
+      contactEmail: (
+        form.elements.namedItem("contactEmail") as HTMLInputElement
+      ).value.trim(),
     };
 
     try {
-      const url = isEdit ? `/api/matrimony/update/${profileId}` : "/api/matrimony/create";
+      const url = isEdit
+        ? `/api/matrimony/update/${profileId}`
+        : "/api/matrimony/create";
       const method = isEdit ? "PUT" : "POST";
 
       const res = await fetch(url, {
@@ -168,7 +211,9 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
       {error && (
-        <p className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">{error}</p>
+        <p className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </p>
       )}
 
       <div>
@@ -303,7 +348,7 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
           defaultValue={initialData?.maritalStatus}
         >
           <option value="">स्थिति चुनें</option>
-          <option value="Never Married">अविवाहित</option>
+          <option value="Single">अविवाहित</option>
           <option value="Divorced">तलाकशुदा</option>
           <option value="Widowed">विधुर/विधवा</option>
           <option value="Separated">अलग</option>
@@ -416,7 +461,9 @@ export function MatrimonyPostForm({ initialData, profileId, onSuccess }: Matrimo
       </div>
 
       <div className="border-t border-gray-200 pt-5">
-        <p className="mb-4 font-body text-sm font-medium text-gray-700">संपर्क विवरण</p>
+        <p className="mb-4 font-body text-sm font-medium text-gray-700">
+          संपर्क विवरण
+        </p>
         <div className="flex flex-col gap-5">
           <div>
             <label htmlFor="contactName" className={labelClass}>

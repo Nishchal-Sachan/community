@@ -42,9 +42,9 @@ export async function getMergedSiteContent(): Promise<Record<SiteSectionKey, Rec
     "hero",
     "cta",
     "leadership",
-    "services",
     "home_images",
     "gallery",
+    "impact",
   ];
 
   const result = {} as Record<SiteSectionKey, Record<string, unknown>>;
@@ -108,17 +108,6 @@ export function leadershipCardsFromContent(
     });
   }
   return out.length > 0 ? out : null;
-}
-
-export function servicesFromContent(services: Record<string, unknown>) {
-  const raw = services.descriptions;
-  const descriptions = Array.isArray(raw)
-    ? raw.map((d) => String(d).trim()).filter(Boolean)
-    : [];
-  return {
-    title: String(services.title ?? "").trim(),
-    descriptions,
-  };
 }
 
 export function imageUrlsFromSection(section: Record<string, unknown>): string[] {

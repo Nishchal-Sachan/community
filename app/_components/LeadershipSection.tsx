@@ -45,11 +45,11 @@ export default function LeadershipSection() {
           id="leadership-heading"
           className="mt-[10px] text-center font-heading text-[42px] font-bold leading-tight text-[#222222]"
         >
-          {leaders[0] ? `श्री ${leaders[0].name} के नेतृत्व में` : "हमारा नेतृत्व"}
+          श्री राकेश महतो के नेतृत्व में
         </h2>
 
         <p className="mx-auto my-5 max-w-[900px] text-center font-body text-base leading-[1.85] text-[#555555] sm:text-lg">
-          अखिल भारतीय कुशवाहा महासभा एकता, सशक्तिकरण और समान अवसरों के माध्यम से समाज के हर वर्ग के उत्थान के लिए प्रतिबद्ध है। श्री राकेश माटो के नेतृत्व में संगठन शिक्षा, रोजगार, सामाजिक न्याय और ग्रामीण व शहरी भारत में समुदाय विकास पर केंद्रित है।
+          अखिल भारतीय कुशवाहा महासभा एकता, सशक्तिकरण और समान अवसरों के माध्यम से समाज के हर वर्ग के उत्थान के लिए प्रतिबद्ध है। श्री राकेश महतो के नेतृत्व में संगठन शिक्षा, रोजगार, सामाजिक न्याय और ग्रामीण व शहरी भारत में समुदाय विकास पर केंद्रित है।
         </p>
 
         <div className="mb-[60px]">
@@ -57,7 +57,6 @@ export default function LeadershipSection() {
         </div>
 
         <div className="mx-auto grid max-w-[1200px] grid-cols-1 gap-10 md:grid-cols-[1fr_2fr] md:gap-[40px]">
-          {/* Left: Leader card(s) */}
           <motion.div
             className="flex flex-col gap-6"
             initial={{ opacity: 0, y: 40 }}
@@ -66,11 +65,15 @@ export default function LeadershipSection() {
             viewport={{ once: true }}
           >
             {leaders.map((leader) => (
-              <LeaderCard key={leader.name} leader={leader} parallaxY={y} />
+              <LeaderCard
+                key={leader.name}
+                leader={leader}
+                parallaxY={y}
+                signatureLine="— राकेश महतो"
+              />
             ))}
           </motion.div>
 
-          {/* Right: Service cards grid */}
           <div className="grid min-w-0 grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-[24px]">
             {leadershipFocus.map((card) => (
               <motion.div
@@ -80,9 +83,7 @@ export default function LeadershipSection() {
                 transition={{ duration: 0.6 }}
                 viewport={{ once: true }}
               >
-                <article
-                  className="rounded-[10px] border border-[#eeeeee] bg-white p-6 transition duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] sm:p-[24px]"
-                >
+                <article className="rounded-[10px] border border-[#eeeeee] bg-white p-6 transition duration-300 ease-out hover:-translate-y-2 hover:shadow-[0_10px_25px_rgba(0,0,0,0.08)] sm:p-[24px]">
                   <h3 className="mb-[10px] font-heading text-[18px] font-semibold text-gray-900">
                     {card.title}
                   </h3>

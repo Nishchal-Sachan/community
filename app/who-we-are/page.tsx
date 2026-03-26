@@ -1,11 +1,15 @@
-import Image from "next/image";
 import Link from "next/link";
-import { leadershipTeam } from "@/data/leadershipTeam";
 import Footer from "@/app/_components/Footer";
+import ImpactStatsSection from "@/app/_components/ImpactStatsSection";
+import LeadershipCmsSliderSection from "@/app/_components/LeadershipCmsSliderSection";
+import {
+  getMergedSiteContent,
+  leadershipCardsFromContent,
+} from "@/lib/get-site-content";
 
 function DividerWithDots({ bg = "bg-white" }: { bg?: string }) {
   return (
-    <div className="relative mx-auto mt-5 w-[120px]" aria-hidden="true">
+    <div className="relative mx-auto mt-5 w-30" aria-hidden="true">
       <div className="h-px w-full bg-[#cccccc]" />
       <div
         className={`absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2 items-center gap-1.5 px-0.5 ${bg}`}
@@ -19,13 +23,43 @@ function DividerWithDots({ bg = "bg-white" }: { bg?: string }) {
 }
 
 const KEY_INITIATIVES = [
-  { icon: "🎓", title: "शिक्षा सहायता", desc: "छात्रों को शिक्षा, स्कॉलरशिप और करियर मार्गदर्शन प्रदान करना।" },
-  { icon: "💼", title: "रोजगार पोर्टल", desc: "युवाओं को नौकरी और व्यवसाय के अवसरों से जोड़ना।" },
-  { icon: "🏥", title: "स्वास्थ्य सेवा", desc: "स्वास्थ्य जागरूकता और चिकित्सा सहायता कार्यक्रम।" },
-  { icon: "👩‍👩‍👧‍👦", title: "महिला सशक्तिकरण", desc: "महिलाओं के लिए प्रशिक्षण और आत्मनिर्भरता कार्यक्रम।" },
-  { icon: "⚖️", title: "कानूनी सहायता", desc: "कानूनी मार्गदर्शन और दस्तावेज़ सहायता।" },
-  { icon: "📢", title: "सामाजिक कार्यक्रम", desc: "सामाजिक और सांस्कृतिक आयोजनों के माध्यम से एकता बढ़ाना।" },
-];
+  {
+    icon: "🎓",
+    title: "शिक्षा सहायता",
+    desc: "छात्रों को शिक्षा, स्कॉलरशिप और करियर मार्गदर्शन प्रदान करना।",
+    href: "/who-we-are#impact",
+  },
+  {
+    icon: "💼",
+    title: "रोजगार पोर्टल",
+    desc: "युवाओं को नौकरी और व्यवसाय के अवसरों से जोड़ना।",
+    href: "/jobs",
+  },
+  {
+    icon: "🏥",
+    title: "स्वास्थ्य सेवा",
+    desc: "स्वास्थ्य जागरूकता और चिकित्सा सहायता कार्यक्रम।",
+    href: "/join",
+  },
+  {
+    icon: "👩‍👩‍👧‍👦",
+    title: "महिला सशक्तिकरण",
+    desc: "महिलाओं के लिए प्रशिक्षण और आत्मनिर्भरता कार्यक्रम।",
+    href: "/members",
+  },
+  {
+    icon: "⚖️",
+    title: "कानूनी सहायता",
+    desc: "कानूनी मार्गदर्शन और दस्तावेज़ सहायता।",
+    href: "/who-we-are#contact",
+  },
+  {
+    icon: "📢",
+    title: "सामाजिक कार्यक्रम",
+    desc: "सामाजिक और सांस्कृतिक आयोजनों के माध्यम से एकता बढ़ाना।",
+    href: "/gallery",
+  },
+] as const;
 
 const ORG_LEVELS = [
   { title: "राष्ट्रीय स्तर", desc: "पूरे देश में नीतियाँ बनाना, दिशा निर्धारित करना और समन्वय स्थापित करना।" },
@@ -42,20 +76,18 @@ const OBJECTIVES = [
   { label: "आत्मनिर्भरता", desc: "समाज के प्रत्येक व्यक्ति को आत्मनिर्भर बनाने के लिए प्रयास करना।" },
 ];
 
-const STATS = [
-  { value: "10,000+", label: "सदस्य", sub: "देशभर में सक्रिय सदस्य नेटवर्क" },
-  { value: "500+", label: "रोजगार अवसर", sub: "युवाओं को जोड़ने के प्रयास" },
-  { value: "200+", label: "शिक्षा सहायता", sub: "छात्रों को मार्गदर्शन प्रदान किया" },
-  { value: "50+", label: "कार्यक्रम", sub: "सामाजिक और जागरूकता आयोजन" },
-];
-
 export const metadata = {
   title: "Who We Are",
   description:
     "अखिल भारतीय कुशवाहा महासभा — एक संगठित, सशक्त और जागरूक समाज के निर्माण की दिशा में समर्पित।",
 };
 
-export default function WhoWeArePage() {
+export const dynamic = "force-dynamic";
+
+export default async function WhoWeArePage() {
+  const content = await getMergedSiteContent();
+  const leadershipCms = leadershipCardsFromContent(content.leadership);
+
   return (
     <main className="min-h-screen overflow-x-hidden">
       {/* 1. Hero */}
@@ -152,44 +184,25 @@ export default function WhoWeArePage() {
         </div>
       </section>
 
-      {/* 4. Leadership */}
-      <section className="border-b border-gray-200 bg-gray-50 py-20 px-6 lg:px-16">
+      {/* 4. Leadership — same LeadershipCmsSliderSection + leadershipCardsFromContent as homepage (`embedded` = title/description stay on this page) */}
+      <section
+        id="who-we-are-leadership"
+        className="border-b border-gray-200 bg-gray-50 py-20 px-6 lg:px-16"
+        aria-labelledby="who-we-are-leadership-heading"
+      >
         <div className="mx-auto max-w-7xl">
-          <div className="mb-10 text-left">
-            <h2 className="font-heading text-2xl font-bold text-gray-800 md:text-3xl">
+          <div className="mb-2 text-left">
+            <h2
+              id="who-we-are-leadership-heading"
+              className="font-heading text-2xl font-bold text-gray-800 md:text-3xl"
+            >
               हमारे नेतृत्वकर्ता
             </h2>
             <p className="mt-4 max-w-2xl font-body text-[15px] leading-[1.85] text-gray-600">
               हमारे अनुभवी नेतृत्वकर्ता समाज के विकास के लिए निरंतर कार्यरत हैं।
             </p>
           </div>
-          <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-3">
-            {leadershipTeam.map((leader, index) => (
-              <div
-                key={index}
-                className={`rounded-xl border border-gray-200 bg-white p-8 text-center shadow-sm ${
-                  leader.primary ? "md:col-span-2 lg:col-span-1" : ""
-                }`}
-              >
-                <div className="relative mx-auto mb-6 h-40 w-40 overflow-hidden rounded-full border-4 border-orange-100">
-                  <Image
-                    src={leader.image}
-                    alt={leader.name}
-                    fill
-                    className="object-cover"
-                    sizes="160px"
-                  />
-                </div>
-                <h3 className="font-heading text-xl font-bold text-gray-800">
-                  {leader.name}
-                </h3>
-                <p className="mt-2 font-body text-base font-medium text-[#F57C00]">
-                  {leader.role}
-                </p>
-                <div className="mx-auto mt-4 h-[3px] w-12 rounded bg-[#F57C00]" aria-hidden />
-              </div>
-            ))}
-          </div>
+          <LeadershipCmsSliderSection cmsCards={leadershipCms} embedded />
         </div>
       </section>
 
@@ -222,8 +235,11 @@ export default function WhoWeArePage() {
         </div>
       </section>
 
-      {/* 6. Key Initiatives */}
-      <section className="border-b border-gray-200 bg-gray-50 py-20 px-6 lg:px-16">
+      {/* 6. Key Initiatives — anchor for nav "सेवाएं" (homepage CMS services section removed) */}
+      <section
+        id="services"
+        className="border-b border-gray-200 bg-gray-50 py-20 px-6 lg:px-16"
+      >
         <div className="mx-auto max-w-7xl">
           <div className="mb-10 text-left">
             <p className="mb-2 font-body text-sm uppercase tracking-[0.2em] text-[#F57C00]">
@@ -237,13 +253,13 @@ export default function WhoWeArePage() {
             {KEY_INITIATIVES.map((item, i) => (
               <Link
                 key={i}
-                href="/#services"
-                className="rounded-xl border border-gray-200 bg-white p-6 text-left shadow-sm"
+                href={item.href}
+                className="group block cursor-pointer rounded-xl border border-gray-200 bg-white p-6 text-left shadow-sm transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F57C00] focus-visible:ring-offset-2"
               >
-                <span className="text-2xl" aria-hidden>
+                <span className="text-2xl transition-transform duration-200 ease-out group-hover:scale-105" aria-hidden>
                   {item.icon}
                 </span>
-                <h3 className="mt-3 font-heading text-lg font-semibold text-gray-800">
+                <h3 className="mt-3 font-heading text-lg font-semibold text-gray-800 group-hover:text-[#F57C00]">
                   {item.title}
                 </h3>
                 <p className="mt-2 font-body text-[15px] leading-[1.85] text-gray-600">
@@ -255,34 +271,8 @@ export default function WhoWeArePage() {
         </div>
       </section>
 
-      {/* 7. Stats */}
-      <section className="border-b border-gray-200 bg-gray-50 py-20 px-6 lg:px-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-10 text-left">
-            <p className="mb-2 font-body text-sm uppercase tracking-[0.2em] text-[#F57C00]">
-              Impact
-            </p>
-            <h2 className="font-heading text-2xl font-bold text-gray-800 md:text-3xl">
-              हमारा प्रभाव
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-            {STATS.map((stat, i) => (
-              <div key={i} className="rounded-xl border border-gray-200 bg-white p-6 text-left shadow-sm">
-                <p className="font-heading text-2xl font-bold text-[#F57C00] md:text-3xl">
-                  {stat.value}
-                </p>
-                <p className="mt-2 font-body text-[15px] font-medium text-gray-800">
-                  {stat.label}
-                </p>
-                <p className="mt-1 font-body text-[14px] leading-[1.7] text-gray-600">
-                  {stat.sub}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* 7. Stats — client fetch /api/stats */}
+      <ImpactStatsSection />
 
       {/* 8. Sankalp */}
       <section className="border-b border-gray-200 bg-white py-20 px-6 lg:px-16">

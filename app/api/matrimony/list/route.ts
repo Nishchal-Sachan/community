@@ -28,18 +28,38 @@ export async function GET() {
       .sort({ createdAt: -1 })
       .lean();
 
+    const subscribed = viewer.hasMarriageSubscription;
+
     const list = profiles.map((p) => {
       const id = String(p._id);
       const createdBy = String(p.createdBy);
       const image = matrimonyPrimaryImage(p);
       const isOwner = viewer.userId === createdBy;
 
-      return {
+      const base = {
         id,
         fullName: p.fullName,
-        profession: p.profession,
+        profession: p.profession ?? "",
         profilePhotoUrl: image,
         isOwner,
+      };
+
+      if (!subscribed) {
+        return base;
+      }
+
+      const ageRaw = p.age;
+      const age =
+        typeof ageRaw === "number" && Number.isFinite(ageRaw)
+          ? Math.max(18, Math.min(120, Math.floor(ageRaw)))
+          : undefined;
+      const location =
+        typeof p.location === "string" ? p.location.trim() : "";
+
+      return {
+        ...base,
+        ...(age !== undefined ? { age } : {}),
+        location,
       };
     });
 

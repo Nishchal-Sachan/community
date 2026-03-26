@@ -6,7 +6,9 @@ import { getAdminFromCookie } from "@/lib/auth";
 import { ApiError, handleApiError } from "@/lib/api-error";
 import { displayFullName } from "@/lib/member-display";
 
-// GET /api/admin/users — directory + account status
+// GET /api/admin/users — membership pipeline only (pending / active)
+// Users with status "none" are excluded so Reject / Delete removes them from this list
+// (those accounts still exist for login until you add a separate “all users” view).
 export async function GET() {
   try {
     const admin = await getAdminFromCookie();
@@ -15,7 +17,7 @@ export async function GET() {
     await connectDB();
 
     const [users, members] = await Promise.all([
-      User.find()
+      User.find({ membershipStatus: { $in: ["pending", "active"] } })
         .select("name email membershipStatus role createdAt")
         .sort({ createdAt: -1 })
         .lean(),

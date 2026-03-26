@@ -1,5 +1,7 @@
 /**
- * One-time script to seed a pseudo member (paid membership) for testing.
+ * One-time script to seed a pseudo member (paid membership + marriage portal) for testing.
+ *
+ * Targets: sachannishchal@gmail.com — sets active membership, isPaid, and marriageSubscriptionStatus active.
  *
  * Usage:
  *   npx tsx scripts/seed-member.ts
@@ -34,6 +36,11 @@ const UserSchema = new mongoose.Schema(
     },
     membership: {
       isPaid: { type: Boolean, default: false },
+    },
+    marriageSubscriptionStatus: {
+      type: String,
+      default: "none",
+      enum: ["none", "active"],
     },
   },
   { timestamps: true }
@@ -81,9 +88,18 @@ async function main() {
   const wasMember = user.role === "member";
   await User.updateOne(
     { email: TARGET_EMAIL },
-    { $set: { role: "member", membershipStatus: "active", "membership.isPaid": true } }
+    {
+      $set: {
+        role: "member",
+        membershipStatus: "active",
+        "membership.isPaid": true,
+        marriageSubscriptionStatus: "active",
+      },
+    }
   );
-  console.log(`User "${TARGET_EMAIL}" updated to paid member.${wasMember ? " (was already member)" : ""}`);
+  console.log(
+    `User "${TARGET_EMAIL}" updated: paid member + marriage portal (premium) active.${wasMember ? " (was already member)" : ""}`
+  );
 
   const memberExists = await Member.findOne({ name: MEMBER_NAME, phone: MEMBER_PHONE });
   if (!memberExists) {

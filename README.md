@@ -15,7 +15,7 @@ Built as a single **Next.js** application (App Router) with **MongoDB** and **JW
 - **Members directory** — Search and filters; visibility controls  
 - **Events** — Admin CRUD; public JSON via `/api/events` (extend with a public events page as needed)  
 - **Gallery** — Dynamic images from CMS (`/gallery`)  
-- **Admin dashboard** — `/admin` — members, payments, events, site content (hero, CTA, leadership, services, homepage images, gallery items)  
+- **Admin dashboard** — `/admin` — members, payments, events, site content (hero, CTA, leadership, homepage images, gallery items)  
 - **Payments** — Membership + marriage subscription; **Payment** records in MongoDB  
 - **Email receipts** — Nodemailer (SMTP) when configured  
 
@@ -41,7 +41,7 @@ Built as a single **Next.js** application (App Router) with **MongoDB** and **JW
 |------|------|
 | Home | `/` |
 | About | `/who-we-are` |
-| Services (homepage section) | `/#services` |
+| सेवाएं (nav anchor) | `/who-we-are#services` |
 | Join / membership flow | `/join`, `/payment` |
 | Login / register | `/login`, `/register` |
 | Members portal | `/members` |
@@ -81,7 +81,7 @@ MongoDB collections are driven by Mongoose models under `lib/models/`:
 | **Job** | Job seeker / job post listings |
 | **Matrimony** | Matrimony profiles and gallery URLs |
 | **Event** | Event records (title, description, date, location, image) |
-| **SiteContent** | CMS documents keyed by `section` (`hero`, `cta`, `leadership`, `services`, `home_images`, `gallery`) |
+| **SiteContent** | CMS documents keyed by `section` (`hero`, `cta`, `leadership`, `home_images`, `gallery`) |
 | **PageContent** | Legacy page content (if still used by older APIs) |
 | **SiteSettings** | Configurable site settings |
 
@@ -208,7 +208,7 @@ Public read: **`GET /api/site-content`**. Admin write: **`PUT /api/admin/site-co
 
 - Admin analytics dashboard  
 - Marriage request / matching workflow beyond listings  
-- Job applications tracking (apply-in-app)  
+- Job portal: employer contact / outreach analytics (optional)  
 - Gallery categories / albums in UI (data fields partially ready)  
 - Subscription expiry automation and reminders  
 - Public-facing events calendar page consuming `/api/events`  

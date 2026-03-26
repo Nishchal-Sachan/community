@@ -139,6 +139,7 @@ export async function recordVerifiedPayment(opts: {
   );
 
   try {
+    console.log("Sending payment email to:", opts.email);
     await sendPaymentReceiptEmail(opts.email.toLowerCase(), emailFields);
   } catch (e) {
     console.error("[record-verified-payment] email failed", e);

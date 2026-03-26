@@ -27,7 +27,7 @@ function SocialIcon({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="flex size-10 shrink-0 items-center justify-center rounded-md bg-[#222222] text-white transition-colors hover:bg-[#F57C00] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1e293b]"
+      className="flex size-10 shrink-0 items-center justify-center rounded-md bg-[#222222] text-white transition-colors duration-200 ease-out hover:bg-[#F57C00] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#1e293b]"
     >
       <Icon className="size-5" strokeWidth={1.75} aria-hidden />
     </a>
@@ -48,23 +48,24 @@ function BrandLogo() {
 
 export default function Footer() {
   return (
-    <footer id="contact" className="bg-[#0f172a]">
-      {/* Section 1: Top Brand Bar */}
-      <div
-        className="flex flex-col items-center justify-between gap-6 border-t-4 border-[#F57C00] bg-[#111111] px-6 py-10 sm:flex-row sm:px-[60px]"
-        aria-label="Brand bar"
-      >
-        <BrandLogo />
-        <div className="flex gap-2.5">
-          {SOCIAL_LINKS.map(({ label, href, Icon }) => (
-            <SocialIcon key={label} href={href} label={label} Icon={Icon} />
-          ))}
+    <footer
+      id="contact"
+      className="border-t-4 border-[#F57C00] bg-[#0f172a]"
+    >
+      <div className="px-6 py-12 sm:px-[60px] sm:py-[72px]">
+        <div className="mx-auto mb-10 flex max-w-[1400px] flex-col items-center justify-between gap-6 sm:flex-row sm:items-center">
+          <BrandLogo />
+          <div
+            className="flex w-full max-w-full flex-row flex-wrap items-center justify-center gap-3 sm:w-auto sm:justify-end md:gap-4"
+            aria-label="सोशल मीडिया"
+          >
+            {SOCIAL_LINKS.map(({ label, href, Icon }) => (
+              <SocialIcon key={label} href={href} label={label} Icon={Icon} />
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* Section 2: Main Footer */}
-      <div className="px-6 py-[80px] sm:px-[60px]">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-10 md:grid-cols-3">
+        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-10 md:grid-cols-2">
           {/* Column 1: About */}
           <div className="min-w-0">
             <h3 className="mb-4 font-heading text-[18px] font-semibold text-white">
@@ -105,18 +106,6 @@ export default function Footer() {
                 फ़ोन: +91 9839422115
               </a>
             </address>
-          </div>
-
-          {/* Column 3: Social */}
-          <div className="min-w-0">
-            <h3 className="mb-4 font-heading text-[18px] font-semibold text-white">
-              सोशल मीडिया
-            </h3>
-            <div className="flex flex-col items-center gap-4">
-              {SOCIAL_LINKS.map(({ label, href, Icon }) => (
-                <SocialIcon key={label} href={href} label={label} Icon={Icon} />
-              ))}
-            </div>
           </div>
         </div>
 

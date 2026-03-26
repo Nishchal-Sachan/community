@@ -1,6 +1,8 @@
 "use client";
 
+import FormBackButton from "@/components/layout/FormBackButton";
 import Link from "next/link";
+import { Briefcase } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { MatrimonyPostForm, type MatrimonyFormData } from "../post/_components/MatrimonyPostForm";
 import { MarriageSubscribeButton } from "./MarriageSubscribeButton";
@@ -11,6 +13,8 @@ interface ListProfile {
   profession: string;
   profilePhotoUrl: string;
   isOwner: boolean;
+  age?: number;
+  location?: string;
 }
 
 interface FullProfileResponse {
@@ -146,60 +150,108 @@ export function MatrimonyListing({
           कोई प्रोफाइल नहीं मिली।
         </div>
       ) : (
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {profiles.map((profile) => (
+        <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
+          {profiles.map((profile) => {
+            const prof = profile.profession?.trim();
+            const showExtra = marriageSubscriptionActive;
+            const loc = showExtra ? profile.location?.trim() : "";
+            const showAge =
+              showExtra &&
+              profile.age !== undefined &&
+              Number.isFinite(profile.age);
+            return (
             <li
               key={profile.id}
-              className="flex flex-col overflow-hidden rounded-lg border border-gray-300 bg-white shadow-sm"
+              className="flex flex-col overflow-hidden rounded-xl border border-gray-200/90 bg-white shadow-[0_2px_10px_rgba(15,23,42,0.05)] transition-[transform,box-shadow] duration-200 ease-out hover:-translate-y-1 hover:shadow-[0_10px_28px_rgba(15,23,42,0.08)]"
             >
-              <div className="flex h-28 shrink-0 bg-gray-100">
-                {profile.profilePhotoUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={profile.profilePhotoUrl}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center font-heading text-2xl text-gray-400">
-                    {profile.fullName.charAt(0).toUpperCase()}
-                  </div>
-                )}
+              {/* Image section — fixed frame, premium crop */}
+              <div className="flex shrink-0 justify-center border-b border-gray-100 bg-gradient-to-b from-gray-50/80 to-gray-50 py-5">
+                <div className="relative h-[300px] w-[250px] shrink-0 overflow-hidden rounded-[12px] border border-gray-200/90 bg-gray-100 shadow-md ring-1 ring-gray-900/[0.06]">
+                  {profile.profilePhotoUrl ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={profile.profilePhotoUrl}
+                        alt=""
+                        className="h-full w-full object-cover object-[center_20%]"
+                      />
+                      <div
+                        className="pointer-events-none absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/15 to-transparent"
+                        aria-hidden
+                      />
+                    </>
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center font-heading text-4xl text-gray-400">
+                      {profile.fullName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
+                </div>
               </div>
-              <div className="flex flex-1 flex-col gap-2 p-3">
-                <h3 className="font-heading text-base font-semibold leading-snug text-gray-900 line-clamp-2">
-                  {profile.fullName}
-                </h3>
-                <p className="font-body text-sm text-gray-600 line-clamp-2">{profile.profession}</p>
-                <div className="mt-auto flex flex-wrap gap-2 pt-1">
+
+              <div className="flex min-h-0 flex-1 flex-col">
+                {/* Info section */}
+                <div className="flex-1 px-5 py-4 text-left">
+                  <h3 className="font-heading text-lg font-bold leading-snug tracking-tight text-gray-900 line-clamp-2">
+                    {profile.fullName}
+                  </h3>
+                  {(prof || showAge || loc) && (
+                    <div className="mt-2.5 space-y-1.5">
+                      {prof ? (
+                        <p className="flex items-start gap-2 font-body text-sm leading-snug text-gray-700">
+                          <Briefcase
+                            className="mt-0.5 size-3.5 shrink-0 text-[#F57C00]/80"
+                            strokeWidth={2}
+                            aria-hidden
+                          />
+                          <span className="min-w-0 line-clamp-2">{prof}</span>
+                        </p>
+                      ) : null}
+                      {showAge ? (
+                        <p className="font-body text-sm leading-snug text-gray-600">
+                          {profile.age} वर्ष
+                        </p>
+                      ) : null}
+                      {loc ? (
+                        <p className="font-body text-sm leading-snug text-gray-600 line-clamp-2">
+                          {loc}
+                        </p>
+                      ) : null}
+                    </div>
+                  )}
+                </div>
+
+                {/* Action section */}
+                <div className="shrink-0 border-t border-gray-200/90 bg-gray-50/40 px-5 pb-5 pt-4">
                   <Link
                     href={`/matrimony/profile/${profile.id}`}
-                    className="inline-flex min-h-[40px] flex-1 items-center justify-center rounded border border-gray-400 bg-white px-3 py-2 text-center font-body text-sm font-medium text-gray-800 hover:bg-gray-50"
+                    prefetch={marriageSubscriptionActive}
+                    className="inline-flex w-full min-h-[42px] items-center justify-center rounded-lg bg-[#F57C00] px-5 py-2 text-center font-body text-sm font-semibold text-white shadow-sm transition-[background-color,box-shadow] duration-200 hover:bg-[#E65100] hover:text-white hover:shadow-md active:bg-[#D84315] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#F57C00] focus-visible:ring-offset-2 focus-visible:ring-offset-gray-50"
                   >
                     विवरण देखें
                   </Link>
                   {marriageSubscriptionActive && profile.isOwner && (
-                    <>
+                    <div className="mt-3 flex gap-2">
                       <button
                         type="button"
                         onClick={() => openEdit(profile)}
-                        className="rounded border border-gray-300 px-3 py-2 font-body text-sm text-gray-700 hover:bg-gray-50"
+                        className="h-9 flex-1 rounded-lg border border-gray-300 bg-white px-3 font-body text-xs font-medium text-gray-800 transition-colors hover:border-gray-400 hover:bg-gray-50"
                       >
                         संपादित करें
                       </button>
                       <button
                         type="button"
                         onClick={() => setDeletingProfileId(profile.id)}
-                        className="rounded border border-red-200 bg-red-50 px-3 py-2 font-body text-sm text-red-800 hover:bg-red-100"
+                        className="h-9 flex-1 rounded-lg border border-red-200 bg-white px-3 font-body text-xs font-medium text-red-800 transition-colors hover:bg-red-50"
                       >
                         हटाएं
                       </button>
-                    </>
+                    </div>
                   )}
                 </div>
               </div>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
 
@@ -224,6 +276,7 @@ export function MatrimonyListing({
             className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg border border-gray-200 bg-white p-6 shadow-xl"
             onClick={(e) => e.stopPropagation()}
           >
+            <FormBackButton />
             <div className="mb-4 flex items-center justify-between">
               <h2 className="font-heading text-xl font-semibold text-gray-900">
                 प्रोफाइल संपादित करें

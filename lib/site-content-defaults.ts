@@ -36,14 +36,6 @@ export const SITE_CONTENT_DEFAULTS: Record<SiteSectionKey, Record<string, unknow
       },
     ],
   },
-  services: {
-    title: "हमारी सेवाएं",
-    descriptions: [
-      "समाज के सर्वांगीण विकास हेतु शिक्षा व स्वास्थ्य कार्यक्रम।",
-      "युवाओं के लिए कौशल व रोजगार संबंधी सहयोग।",
-      "सांस्कृतिक व सामाजिक एकता के आयोजन।",
-    ],
-  },
   home_images: {
     images: [
       "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80",
@@ -53,5 +45,9 @@ export const SITE_CONTENT_DEFAULTS: Record<SiteSectionKey, Record<string, unknow
   gallery: {
     /** Each entry: `{ id, imageUrl, title?, category?, albumId? }` */
     items: [] as Array<Record<string, unknown>>,
+  },
+  /** Public impact section / GET /api/stats — `educationSupport` is admin-controlled display count */
+  impact: {
+    educationSupport: 0,
   },
 };

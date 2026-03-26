@@ -45,26 +45,26 @@ export default function HeroSection({ hero }: HeroSectionProps) {
         aria-hidden="true"
       />
 
-      {/* Content — z-2, vertically centered, max-width 1200px */}
-      <div className="relative z-2 mx-auto flex h-full max-w-300 items-center px-5 pl-5 sm:pl-20 sm:pr-6 max-sm:justify-center max-sm:text-center">
-        <div className="max-w-150 text-left max-sm:mx-auto max-sm:text-center">
+      {/* Content — z-2; heading block up to ~1152px for balanced wraps */}
+      <div className="relative z-2 mx-auto flex h-full w-full max-w-[1200px] items-center px-5 pl-5 sm:pl-20 sm:pr-6 max-sm:justify-center max-sm:text-center">
+        <div className="w-full max-w-[min(72rem,calc(100vw-2.5rem))] text-left max-sm:mx-auto max-sm:text-center">
           <h1
             id="hero-title"
-            className="max-w-150 font-heading font-bold leading-[1.1] text-white max-sm:text-[32px] sm:text-[56px] md:text-[60px] lg:text-[64px]"
+            className="w-full font-heading font-bold leading-[1.14] text-white whitespace-normal break-keep text-balance max-sm:text-[36px] sm:text-[52px] md:text-[58px] lg:text-[64px]"
           >
             {title ? (
-              <span className="whitespace-pre-line">{title}</span>
+              title
             ) : (
               <>
-                <span>{DEFAULT_TITLE_LINE1}</span>
-                <br className="max-sm:hidden" />
-                <span>{DEFAULT_TITLE_LINE2}</span>
+                <span className="block sm:inline">{DEFAULT_TITLE_LINE1}</span>
+                <span className="hidden sm:inline">&nbsp;</span>
+                <span className="block sm:inline">{DEFAULT_TITLE_LINE2}</span>
               </>
             )}
           </h1>
 
           <p
-            className="mt-5 max-w-150 font-body text-base font-normal leading-[1.6] text-white/90 tracking-[0.3px] sm:text-[18px] md:text-[20px] max-sm:mx-auto max-sm:text-center"
+            className="mt-5 max-w-[min(42rem,calc(100vw-2.5rem))] font-body text-base font-normal leading-relaxed text-white/90 tracking-[0.3px] sm:text-[18px] md:text-[20px] max-sm:mx-auto max-sm:text-center"
           >
             {subtitle}
           </p>

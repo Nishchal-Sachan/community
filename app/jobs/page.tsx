@@ -1,3 +1,4 @@
+import { FormPageShell } from "@/components/layout/FormPageShell";
 import { Container } from "@/components/ui/Container";
 import { getUserFromCookie } from "@/lib/user-auth";
 import { hasActiveMembership } from "@/lib/member-access";
@@ -9,10 +10,12 @@ export default async function JobsPage() {
   const canAccess = await hasActiveMembership(payload);
 
   return (
-    <main className="min-h-screen bg-gray-50 py-16">
-      <Container className="max-w-4xl">
-        {canAccess ? <JobsPageContent /> : <JobsPortalRestricted />}
-      </Container>
+    <main>
+      <FormPageShell>
+        <Container className="max-w-4xl">
+          {canAccess ? <JobsPageContent /> : <JobsPortalRestricted />}
+        </Container>
+      </FormPageShell>
     </main>
   );
 }

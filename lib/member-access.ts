@@ -11,12 +11,18 @@ type LeanUser = {
 
 /**
  * Resolve status from DB document. Legacy users (no membershipStatus) use role + isPaid.
+ * "active" always requires membership.isPaid — job portal / directory must match paid ₹50 members only.
  */
 export function resolveMembershipStatus(user: LeanUser): UserMembershipStatus {
   if (!user) return "none";
   const s = user.membershipStatus;
-  if (s === "active" || s === "pending" || s === "none") return s;
-  if (user.role === "member" && user.membership?.isPaid) return "active";
+  const paid = Boolean(user.membership?.isPaid);
+
+  if (s === "pending" || s === "none") return s;
+  if (s === "active") {
+    return paid ? "active" : "none";
+  }
+  if (user.role === "member" && paid) return "active";
   return "none";
 }
 

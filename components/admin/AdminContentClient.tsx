@@ -53,9 +53,9 @@ export default function AdminContentClient() {
   });
   const [slides, setSlides] = useState<Slide[]>([]);
   const [cards, setCards] = useState<Card[]>([]);
-  const [services, setServices] = useState({ title: "", descriptionsText: "" });
   const [homeImagesText, setHomeImagesText] = useState("");
   const [galleryItems, setGalleryItems] = useState<GalleryFormItem[]>([]);
+  const [impactEducationSupport, setImpactEducationSupport] = useState("0");
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -75,16 +75,17 @@ export default function AdminContentClient() {
       setSlides(Array.isArray(cta?.slides) && cta.slides.length ? cta.slides : []);
       const lead = c.leadership as { cards?: Card[] };
       setCards(Array.isArray(lead?.cards) && lead.cards.length ? lead.cards : []);
-      const svc = c.services as { title?: string; descriptions?: string[] };
-      setServices({
-        title: String(svc?.title ?? ""),
-        descriptionsText: Array.isArray(svc?.descriptions) ? svc.descriptions.join("\n") : "",
-      });
       const hi = c.home_images as { images?: string[] };
       setHomeImagesText(Array.isArray(hi?.images) ? hi.images.join("\n") : "");
       const gal = c.gallery as Record<string, unknown> | undefined;
       setGalleryItems(
         normalizeGalleryItems(gal).map(galleryItemToForm)
+      );
+      const imp = c.impact as { educationSupport?: number } | undefined;
+      setImpactEducationSupport(
+        imp?.educationSupport !== undefined && imp?.educationSupport !== null
+          ? String(imp.educationSupport)
+          : "0"
       );
     } finally {
       setLoading(false);
@@ -364,40 +365,8 @@ export default function AdminContentClient() {
       </section>
 
       <section className={box}>
-        <h3 className="mb-3 border-b border-gray-200 pb-1 text-sm font-semibold">D) Services</h3>
-        <label className={label}>Title</label>
-        <input
-          className={input}
-          value={services.title}
-          onChange={(e) => setServices((s) => ({ ...s, title: e.target.value }))}
-        />
-        <label className={`${label} mt-2`}>Descriptions (one per line)</label>
-        <textarea
-          className={input}
-          rows={6}
-          value={services.descriptionsText}
-          onChange={(e) => setServices((s) => ({ ...s, descriptionsText: e.target.value }))}
-        />
-        <button
-          type="button"
-          className="mt-2 border border-gray-400 bg-gray-100 px-3 py-1 text-sm"
-          onClick={() =>
-            void save("services", {
-              title: services.title,
-              descriptions: services.descriptionsText
-                .split("\n")
-                .map((l) => l.trim())
-                .filter(Boolean),
-            })
-          }
-        >
-          Save services
-        </button>
-      </section>
-
-      <section className={box}>
         <h3 className="mb-3 border-b border-gray-200 pb-1 text-sm font-semibold">
-          E) Homepage images (URLs, one per line)
+          D) Homepage images (URLs, one per line)
         </h3>
         <textarea
           className={input}
@@ -423,7 +392,7 @@ export default function AdminContentClient() {
 
       <section className={box}>
         <h3 className="mb-3 border-b border-gray-200 pb-1 text-sm font-semibold">
-          F) Gallery (चित्र — भविष्य में श्रेणी / एल्बम)
+          E) Gallery (चित्र — भविष्य में श्रेणी / एल्बम)
         </h3>
         <p className="mb-3 text-xs text-gray-600">
           प्रत्येक पंक्ति: चित्र URL (अपलोड या पेस्ट), वैकल्पिक शीर्षक, वैकल्पिक श्रेणी व एल्बम
@@ -563,6 +532,36 @@ export default function AdminContentClient() {
           }
         >
           Save gallery
+        </button>
+      </section>
+
+      <section className={box}>
+        <h3 className="mb-3 border-b border-gray-200 pb-1 text-sm font-semibold">
+          F) प्रभाव — शिक्षा सहायता
+        </h3>
+        <p className="mb-2 text-xs text-gray-600">
+          यह संख्या &quot;हमारा प्रभाव&quot; में दिखती है। सार्वजनिक API:{" "}
+          <code className="rounded bg-gray-100 px-1">GET /api/stats</code> →{" "}
+          <code className="rounded bg-gray-100 px-1">educationSupport</code>
+        </p>
+        <label className={label}>शिक्षा सहायता संख्या</label>
+        <input
+          type="number"
+          min={0}
+          className={input}
+          value={impactEducationSupport}
+          onChange={(e) => setImpactEducationSupport(e.target.value)}
+        />
+        <button
+          type="button"
+          className="mt-2 border border-gray-400 bg-gray-100 px-3 py-1 text-sm"
+          onClick={() =>
+            void save("impact", {
+              educationSupport: Math.max(0, Math.floor(Number(impactEducationSupport)) || 0),
+            })
+          }
+        >
+          सहेजें
         </button>
       </section>
     </div>

@@ -4,9 +4,9 @@ export type SiteSectionKey =
   | "hero"
   | "cta"
   | "leadership"
-  | "services"
   | "home_images"
-  | "gallery";
+  | "gallery"
+  | "impact";
 
 export interface ISiteContent extends Document {
   section: SiteSectionKey;
@@ -18,7 +18,7 @@ const SiteContentSchema = new Schema<ISiteContent>(
     section: {
       type: String,
       required: true,
-      enum: ["hero", "cta", "leadership", "services", "home_images", "gallery"],
+      enum: ["hero", "cta", "leadership", "home_images", "gallery", "impact"],
       unique: true,
     },
     data: { type: Schema.Types.Mixed, required: true, default: {} },

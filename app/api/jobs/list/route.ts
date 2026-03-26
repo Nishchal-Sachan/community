@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import Job from "@/lib/models/Job";
 import { handleApiError } from "@/lib/api-error";
+import { jobToPublicJson } from "@/lib/job-public-json";
 import { requireActiveMember } from "@/lib/require-active-member";
 
 // GET /api/jobs/list?type=job|profile&category=...&search=...
@@ -9,6 +10,7 @@ export async function GET(req: NextRequest) {
   try {
     const gate = await requireActiveMember();
     if (!gate.ok) return gate.response;
+    const { payload } = gate;
 
     const { searchParams } = new URL(req.url);
     const type = searchParams.get("type");
@@ -38,29 +40,40 @@ export async function GET(req: NextRequest) {
           { description: { $regex: term, $options: "i" } },
           { category: { $regex: term, $options: "i" } },
           { location: { $regex: term, $options: "i" } },
+          { jobRole: { $regex: term, $options: "i" } },
+          { company: { $regex: term, $options: "i" } },
+          { companyName: { $regex: term, $options: "i" } },
+          { skills: { $regex: term, $options: "i" } },
+          { skillsRequired: { $regex: term, $options: "i" } },
+          { candidateSkills: { $regex: term, $options: "i" } },
+          { education: { $regex: term, $options: "i" } },
+          { bio: { $regex: term, $options: "i" } },
+          { preferredJobType: { $regex: term, $options: "i" } },
         ];
       }
     }
 
     await connectDB();
 
-    const jobs = await Job.find(query)
-      .sort({ createdAt: -1 })
-      .lean();
+    const jobs = await Job.find(query).sort({ createdAt: -1 }).lean();
 
-    const list = jobs.map((j) => ({
-      id: (j._id as { toString(): string }).toString(),
-      createdBy: (j.createdBy as { toString(): string }).toString(),
-      type: j.type,
-      title: j.title,
-      description: j.description,
-      category: j.category,
-      location: j.location,
-      contactName: j.contactName,
-      contactPhone: j.contactPhone,
-      contactEmail: j.contactEmail,
-      createdAt: j.createdAt,
-    }));
+    const list = jobs.map((j) => {
+      const isOwner =
+        (j.createdBy as { toString(): string }).toString() === payload.userId;
+      const pub = jobToPublicJson(j as Record<string, unknown>) as Record<
+        string,
+        unknown
+      >;
+      return {
+        ...pub,
+        ...(isOwner
+          ? {
+              contactPhone: j.contactPhone,
+              contactEmail: j.contactEmail,
+            }
+          : {}),
+      };
+    });
 
     return NextResponse.json({ jobs: list });
   } catch (error) {

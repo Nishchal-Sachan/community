@@ -4,7 +4,10 @@ import { connectDB } from "@/lib/db";
 import Job from "@/lib/models/Job";
 import { requireActiveMember } from "@/lib/require-active-member";
 import { ApiError, handleApiError, parseBody } from "@/lib/api-error";
-import { JOB_MAX_LENGTHS } from "@/lib/models/Job";
+import { JOB_MAX_LENGTHS } from "@/lib/job-field-limits";
+import { jobToPublicJson } from "@/lib/job-public-json";
+import { validateJobPostingFields } from "@/lib/validate-job-posting";
+import { validateSeekerProfileFields } from "@/lib/validate-job-seeker-profile";
 
 const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
 
@@ -14,7 +17,7 @@ function sanitizeString(val: unknown, maxLen: number): string {
     .slice(0, maxLen);
 }
 
-function validateUpdateBody(body: unknown): {
+function validateProfileUpdateBody(body: unknown): {
   title: string;
   description: string;
   category: string;
@@ -72,7 +75,7 @@ export async function PUT(
     }
 
     const body = await parseBody(req);
-    const data = validateUpdateBody(body);
+    console.log("REQ BODY:", body);
 
     await connectDB();
 
@@ -80,36 +83,48 @@ export async function PUT(
     if (!job) throw new ApiError(404, "Job not found");
 
     if (job.createdBy.toString() !== payload.userId) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    job.title = data.title;
-    job.description = data.description;
-    job.category = data.category;
-    job.location = data.location;
-    job.contactName = data.contactName;
-    job.contactPhone = data.contactPhone;
-    job.contactEmail = data.contactEmail;
+    if (job.type === "profile") {
+      const data = validateProfileUpdateBody(body);
+      const seeker = validateSeekerProfileFields(body as Record<string, unknown>);
+      job.set({
+        ...data,
+        ...seeker,
+      });
+      job.markModified("skills");
+      job.jobRole = undefined;
+      job.jobType = undefined;
+      job.salaryMin = undefined;
+      job.salaryMax = undefined;
+      job.salaryNote = undefined;
+      job.company = undefined;
+      job.remote = false;
+    } else {
+      const data = validateProfileUpdateBody(body);
+      const extras = validateJobPostingFields(body as Record<string, unknown>);
+      job.set({
+        ...data,
+        ...extras,
+      });
+      job.salaryMin = extras.salaryMin.trim() ? extras.salaryMin : undefined;
+      job.salaryMax = extras.salaryMax.trim() ? extras.salaryMax : undefined;
+      job.salaryNote = extras.salaryNote.trim() ? extras.salaryNote : undefined;
+      job.markModified("skills");
+      job.preferredJobType = undefined;
+      job.education = undefined;
+      job.bio = undefined;
+    }
+
+
     await job.save();
+    console.log("SAVED JOB:", job.toObject());
 
     return NextResponse.json({
       success: true,
       message: "Job updated successfully",
-      job: {
-        id: job._id.toString(),
-        type: job.type,
-        title: job.title,
-        description: job.description,
-        category: job.category,
-        location: job.location,
-        contactName: job.contactName,
-        contactPhone: job.contactPhone,
-        contactEmail: job.contactEmail,
-        createdAt: job.createdAt,
-      },
+      job: jobToPublicJson(job),
     });
   } catch (error) {
     return handleApiError(error, "PUT /api/jobs/update/:id");

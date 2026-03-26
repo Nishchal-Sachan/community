@@ -1,3 +1,5 @@
+import FormBackButton from "@/components/layout/FormBackButton";
+import { FormPageShell } from "@/components/layout/FormPageShell";
 import { Container } from "@/components/ui/Container";
 import { getUserFromCookie } from "@/lib/user-auth";
 import { hasActiveMembership } from "@/lib/member-access";
@@ -9,20 +11,23 @@ export default async function JobPostPage() {
   const canAccess = await hasActiveMembership(payload);
 
   return (
-    <main className="min-h-screen bg-gray-50 py-16">
-      <Container className="max-w-2xl">
-        {canAccess ? (
-          <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
-            <h1 className="mb-2 font-heading text-2xl font-bold text-gray-900">नौकरी पोस्ट करें</h1>
-            <p className="mb-8 font-body text-gray-600">
-              ABKM समुदाय के साथ अवसर या अपना प्रोफाइल साझा करें।
-            </p>
-            <JobPostForm />
-          </div>
-        ) : (
-          <JobsPortalRestricted />
-        )}
-      </Container>
+    <main>
+      <FormPageShell>
+        <Container className="max-w-3xl">
+          {canAccess ? (
+            <div className="rounded-xl border border-gray-200 bg-white p-8 shadow-sm">
+              <FormBackButton />
+              <h1 className="mb-2 font-heading text-2xl font-bold text-gray-900">Job portal</h1>
+              <p className="mb-6 font-body text-gray-600">
+                Post a job opening (employer) or build a job seeker candidate profile — pick the flow that matches you.
+              </p>
+              <JobPostForm />
+            </div>
+          ) : (
+            <JobsPortalRestricted />
+          )}
+        </Container>
+      </FormPageShell>
     </main>
   );
 }

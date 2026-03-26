@@ -3,7 +3,10 @@ import { connectDB } from "@/lib/db";
 import Job from "@/lib/models/Job";
 import { requireActiveMember } from "@/lib/require-active-member";
 import { ApiError, handleApiError, parseBody } from "@/lib/api-error";
-import { JOB_MAX_LENGTHS } from "@/lib/models/Job";
+import { JOB_MAX_LENGTHS } from "@/lib/job-field-limits";
+import { jobToPublicJson } from "@/lib/job-public-json";
+import { validateJobPostingFields } from "@/lib/validate-job-posting";
+import { validateSeekerProfileFields } from "@/lib/validate-job-seeker-profile";
 
 const EMAIL_REGEX = /^\S+@\S+\.\S+$/;
 
@@ -67,30 +70,53 @@ export async function POST(req: NextRequest) {
     const { payload } = gate;
 
     const body = await parseBody(req);
-    const data = validateCreateBody(body);
+    /** Parsed JSON body (App Router has no `req.body` — this is the equivalent). */
+    console.log("REQ BODY:", body);
+
+    if (!body) {
+      return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
+    }
+
+    if (!body.title || !body.category) {
+      return NextResponse.json({ message: "Required fields missing" }, { status: 400 });
+    }
+
+    const common = validateCreateBody(body);
 
     await connectDB();
 
-    const job = await Job.create({
-      ...data,
+    if (common.type === "job") {
+      const posting = validateJobPostingFields(body as Record<string, unknown>);
+      const job = new Job({
+        ...common,
+        ...posting,
+        createdBy: payload.userId,
+      });
+      await job.save();
+      console.log("SAVED JOB:", job.toObject());
+
+      return NextResponse.json(
+        {
+          message: "Job created successfully",
+          job: jobToPublicJson(job),
+        },
+        { status: 201 }
+      );
+    }
+
+    const seeker = validateSeekerProfileFields(body as Record<string, unknown>);
+    const job = new Job({
+      ...common,
+      ...seeker,
       createdBy: payload.userId,
     });
+    await job.save();
+    console.log("SAVED JOB:", job.toObject());
 
     return NextResponse.json(
       {
-        message: "Job created successfully",
-        job: {
-          id: job._id.toString(),
-          type: job.type,
-          title: job.title,
-          description: job.description,
-          category: job.category,
-          location: job.location,
-          contactName: job.contactName,
-          contactPhone: job.contactPhone,
-          contactEmail: job.contactEmail,
-          createdAt: job.createdAt,
-        },
+        message: "Profile created successfully",
+        job: jobToPublicJson(job),
       },
       { status: 201 }
     );

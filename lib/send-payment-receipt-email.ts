@@ -1,40 +1,26 @@
-import nodemailer from "nodemailer";
+import { getEmailTransporter } from "@/services/emailService";
 import {
   buildReceiptEmailHtml,
   RECEIPT_ORG_NAME,
   type ReceiptEmailFields,
 } from "@/lib/payment-receipt-html";
 
-function getTransporter() {
-  const host = process.env.SMTP_HOST;
-  const port = parseInt(process.env.SMTP_PORT ?? "587", 10);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  if (!host || !user || !pass) return null;
-
-  return nodemailer.createTransport({
-    host,
-    port,
-    secure: process.env.SMTP_SECURE === "true",
-    auth: { user, pass },
-  });
-}
-
 export async function sendPaymentReceiptEmail(
   to: string,
   fields: ReceiptEmailFields
 ): Promise<void> {
-  const transporter = getTransporter();
+  const transporter = getEmailTransporter();
   if (!transporter) {
     console.warn(
-      "[payment-receipt] SMTP not configured (SMTP_HOST, SMTP_USER, SMTP_PASS); skipping email"
+      "[payment-receipt] SMTP not configured (set EMAIL_USER and EMAIL_PASS); skipping email"
     );
     return;
   }
 
   const from =
     process.env.SMTP_FROM?.trim() ||
-    process.env.SMTP_USER ||
+    process.env.EMAIL_USER?.trim() ||
+    process.env.SMTP_USER?.trim() ||
     `"${RECEIPT_ORG_NAME}" <noreply@localhost>`;
 
   const html = buildReceiptEmailHtml(fields);

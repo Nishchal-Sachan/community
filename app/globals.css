@@ -1,5 +1,14 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 @import "../styles/tailwind-theme.css";
+
+:root {
+  /*
+   * Offset for fixed site header — must match `components/layout/Header.tsx`:
+   * top bar `h-12` (3rem) + main navbar `h-18` (4.5rem) starting at `top-12`.
+   */
+  --site-header-offset: calc(3rem + 4.5rem);
+}
 
 html {
   scroll-behavior: smooth;
@@ -99,4 +108,14 @@ body {
     opacity: 1;
     transform: none;
   }
+}
+
+/* Horizontal scroll strips: hide scrollbar but keep scroll (e.g. gallery thumbnails) */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

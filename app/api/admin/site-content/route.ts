@@ -9,9 +9,9 @@ const SECTIONS: SiteSectionKey[] = [
   "hero",
   "cta",
   "leadership",
-  "services",
   "home_images",
   "gallery",
+  "impact",
 ];
 
 // PUT /api/admin/site-content — replace one section's `data`

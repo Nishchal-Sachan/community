@@ -5,6 +5,10 @@ import User from "@/lib/models/User";
 import Member from "@/lib/models/Member";
 import { getAdminFromCookie } from "@/lib/auth";
 import { ApiError, handleApiError, parseBody } from "@/lib/api-error";
+import {
+  ensureMemberDirectoryForApprovedUser,
+  removeMemberDirectoryForUser,
+} from "@/lib/member-directory-sync";
 import { displayFullName } from "@/lib/member-display";
 
 // GET /api/admin/users/:id
@@ -28,6 +32,12 @@ export async function GET(
       ? displayFullName(member as { name: string; fullName?: string })
       : user.name;
 
+    const u = user as {
+      membership?: { isPaid?: boolean };
+      marriageSubscriptionStatus?: string;
+      createdAt?: Date;
+    };
+
     return NextResponse.json({
       user: {
         id: String(user._id),
@@ -35,9 +45,9 @@ export async function GET(
         email: user.email,
         membershipStatus: user.membershipStatus,
         role: user.role,
-        marriageSubscriptionStatus: (user as { marriageSubscriptionStatus?: string })
-          .marriageSubscriptionStatus,
-        createdAt: (user as { createdAt?: Date }).createdAt,
+        membershipIsPaid: Boolean(u.membership?.isPaid),
+        marriageSubscriptionStatus: u.marriageSubscriptionStatus,
+        createdAt: u.createdAt,
       },
       member: member
         ? {
@@ -88,7 +98,15 @@ export async function PATCH(
           "membership.isPaid": true,
         },
       });
+      const updated = await User.findById(id).select("name email").lean();
+      if (updated) {
+        await ensureMemberDirectoryForApprovedUser(id, {
+          name: String(updated.name ?? ""),
+          email: String(updated.email ?? ""),
+        });
+      }
     } else if (action === "reject") {
+      await removeMemberDirectoryForUser(id);
       await User.findByIdAndUpdate(id, {
         $set: {
           membershipStatus: "none",

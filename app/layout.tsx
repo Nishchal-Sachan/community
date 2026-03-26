@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
+import { AppToaster } from "@/components/AppToaster";
 import Header from "@/components/layout/Header";
 
 const inter = Inter({
@@ -38,7 +39,8 @@ export default function RootLayout({
     <html lang="hi" className={`${inter.variable} ${poppins.variable}`}>
       <body className="min-h-screen bg-background-white font-body text-body antialiased">
         <Header />
-        <div className="pt-[108px]">{children}</div>
+        <AppToaster />
+        <div className="pt-[var(--site-header-offset)]">{children}</div>
       </body>
     </html>
   );

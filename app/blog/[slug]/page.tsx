@@ -1,10 +1,10 @@
-import type { Metadata } from "next";
-import { notFound } from "next/navigation";
-import DOMPurify from "isomorphic-dompurify";
-import BlogBackButton from "@/app/blog/_components/BlogBackButton";
 import Footer from "@/app/_components/Footer";
+import BlogBackButton from "@/app/blog/_components/BlogBackButton";
 import { connectDB } from "@/lib/db";
 import Blog from "@/lib/models/Blog";
+import DOMPurify from "isomorphic-dompurify";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -15,12 +15,20 @@ function plainForMeta(s: string): string {
     .replace(/\s+/g, " ")
     .trim();
 }
+function normalizeSlug(slug: string) {
+  return slug
+    .toLowerCase()
+    .replace(/[^\p{L}\p{M}\p{N}-]/gu, "") // remove | and special chars
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 const META_DESC_MAX = 160;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug: raw } = await params;
-  const slug = decodeURIComponent(raw ?? "").trim().toLowerCase();
+  const decoded = decodeURIComponent(raw ?? "");
+  const slug = normalizeSlug(decoded);
   if (!slug) return { title: "ब्लॉग" };
 
   await connectDB();
@@ -71,7 +79,10 @@ function BlogBody({ content }: { content: string }) {
   }
 
   const blocks = trimmed
-    ? trimmed.split(/\n{2,}/).map((b) => b.trim()).filter(Boolean)
+    ? trimmed
+        .split(/\n{2,}/)
+        .map((b) => b.trim())
+        .filter(Boolean)
     : [];
 
   return (
@@ -85,7 +96,8 @@ function BlogBody({ content }: { content: string }) {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug: raw } = await params;
-  const slug = decodeURIComponent(raw ?? "").trim().toLowerCase();
+  const decoded = decodeURIComponent(raw ?? "");
+  const slug = normalizeSlug(decoded);
   if (!slug) notFound();
 
   await connectDB();

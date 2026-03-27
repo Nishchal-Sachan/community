@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
-import mongoose from "mongoose";
+import { ApiError, handleApiError, parseBody } from "@/lib/api-error";
+import { getAdminFromCookie } from "@/lib/auth";
+import { serializeBlog } from "@/lib/blog-json";
+import { ensureUniqueBlogSlug, slugFromTitle } from "@/lib/blog-slug";
 import { connectDB } from "@/lib/db";
 import Blog from "@/lib/models/Blog";
-import { getAdminFromCookie } from "@/lib/auth";
-import { ApiError, handleApiError, parseBody } from "@/lib/api-error";
-import { slugFromTitle, ensureUniqueBlogSlug } from "@/lib/blog-slug";
-import { serializeBlog } from "@/lib/blog-json";
+import mongoose from "mongoose";
+import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/admin/blogs — all posts (published + drafts), for admin UI
 export async function GET() {
@@ -53,33 +53,44 @@ export async function POST(req: NextRequest) {
     if (!title) throw new ApiError(400, "Title is required");
     if (!content) throw new ApiError(400, "Content is required");
 
-    const excerpt = String(body.excerpt ?? "").trim().slice(0, 500);
-    const coverImage = String(body.coverImage ?? "").trim().slice(0, 2000);
-    const category = String(body.category ?? "").trim().slice(0, 120);
+    const excerpt = String(body.excerpt ?? "")
+      .trim()
+      .slice(0, 500);
+    const coverImage = String(body.coverImage ?? "")
+      .trim()
+      .slice(0, 2000);
+    const category = String(body.category ?? "")
+      .trim()
+      .slice(0, 120);
     const tags = parseTags(body.tags);
 
     let author: mongoose.Types.ObjectId | undefined;
     const authorRaw = body.author;
     if (authorRaw != null && String(authorRaw).trim()) {
       const id = String(authorRaw).trim();
-      if (!mongoose.isValidObjectId(id)) throw new ApiError(400, "Invalid author id");
+      if (!mongoose.isValidObjectId(id))
+        throw new ApiError(400, "Invalid author id");
       author = new mongoose.Types.ObjectId(id);
     }
 
     const published =
       typeof body.published === "boolean" ? body.published : true;
 
-    let slugBase: string;
-    if (body.slug != null && String(body.slug).trim()) {
-      slugBase = String(body.slug).trim().toLowerCase().replace(/\s+/g, "-");
-    } else {
-      slugBase = slugFromTitle(title);
-    }
+    // let slugBase: string;
+    // if (body.slug != null && String(body.slug).trim()) {
+    //   slugBase = String(body.slug).trim().toLowerCase().replace(/\s+/g, "-");
+    // } else {
+    //   slugBase = slugFromTitle(title);
+    // }
+    let slugBase = slugFromTitle(title);
     if (!slugBase) slugBase = "post";
 
     await connectDB();
+
     const slug = await ensureUniqueBlogSlug(slugBase.slice(0, 200));
 
+    console.log("TITLE:", title);
+    console.log("SLUG BASE:", slugBase);
     const doc = await Blog.create({
       title,
       slug,
@@ -97,10 +108,9 @@ export async function POST(req: NextRequest) {
       .lean();
 
     return NextResponse.json({
-      blog: serializeBlog(
-        populated as Parameters<typeof serializeBlog>[0],
-        { includeContent: true },
-      ),
+      blog: serializeBlog(populated as Parameters<typeof serializeBlog>[0], {
+        includeContent: true,
+      }),
     });
   } catch (error) {
     return handleApiError(error, "POST /api/admin/blogs");

@@ -1,17 +1,25 @@
-import { NextRequest, NextResponse } from "next/server";
-import { connectDB } from "@/lib/db";
-import Blog from "@/lib/models/Blog";
 import { ApiError, handleApiError } from "@/lib/api-error";
 import { serializeBlog } from "@/lib/blog-json";
+import { connectDB } from "@/lib/db";
+import Blog from "@/lib/models/Blog";
+import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/blogs/:slug — single published post
+function normalizeSlug(slug: string) {
+  return slug
+    .toLowerCase()
+    .replace(/[^\p{L}\p{M}\p{N}-]/gu, "") // removes | and special chars
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
     const { slug: raw } = await params;
-    const slug = decodeURIComponent(raw ?? "").trim().toLowerCase();
+    const decoded = decodeURIComponent(raw ?? "");
+    const slug = normalizeSlug(decoded);
     if (!slug) throw new ApiError(400, "Invalid slug");
 
     await connectDB();

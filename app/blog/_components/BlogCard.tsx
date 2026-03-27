@@ -13,11 +13,11 @@ export default function BlogCard({
   excerpt,
   coverImage,
 }: BlogCardProps) {
+  console.log("CARD SLUG:", slug);
   const href = `/blog/${encodeURIComponent(slug)}`;
   const coverSrc = coverImage.trim() || "/placeholder.jpg";
   const excerptText =
-    excerpt.trim() ||
-    "समाज, कार्यक्रमों और समाचार पर विस्तृत जानकारी पढ़ें।";
+    excerpt.trim() || "समाज, कार्यक्रमों और समाचार पर विस्तृत जानकारी पढ़ें।";
 
   return (
     <article className="flex h-full flex-col overflow-hidden bg-white rounded-xl shadow hover:shadow-lg transition">

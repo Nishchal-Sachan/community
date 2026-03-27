@@ -2,7 +2,7 @@ import Footer from "@/app/_components/Footer";
 import BlogBackButton from "@/app/blog/_components/BlogBackButton";
 import { connectDB } from "@/lib/db";
 import Blog from "@/lib/models/Blog";
-import DOMPurify from "isomorphic-dompurify";
+import SafeHtml from "@/components/SafeHtml";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -69,13 +69,7 @@ function BlogBody({ content }: { content: string }) {
     /^[\s]*</.test(trimmed) || /<\/[a-z][\s\S]*>/i.test(trimmed);
 
   if (looksHtml) {
-    const clean = DOMPurify.sanitize(trimmed);
-    return (
-      <div
-        className="prose prose-neutral max-w-none"
-        dangerouslySetInnerHTML={{ __html: clean }}
-      />
-    );
+    return <SafeHtml html={trimmed} />;
   }
 
   const blocks = trimmed

@@ -16,8 +16,8 @@ const NAV_ITEMS = [
   { href: "/jobs", label: "रोजगार पोर्टल" },
   { href: "/matrimony", label: "वैवाहिक" },
   { href: "/gallery", label: "गैलरी" },
-  { href: "/blog", label: "Blog" },
-  { href: "/helpdesk", label: "संपर्क करें" },
+  { href: "/blog", label: "Blogs" },
+  { href: "/helpdesk", label: "शिकायत पोर्टल" },
 ] as const;
 
 function LogoMark() {

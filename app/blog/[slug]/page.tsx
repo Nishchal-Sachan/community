@@ -3,6 +3,7 @@ import BlogBackButton from "@/app/blog/_components/BlogBackButton";
 import { connectDB } from "@/lib/db";
 import Blog from "@/lib/models/Blog";
 import SafeHtml from "@/components/SafeHtml";
+import ShareButtons from "@/components/ShareButtons";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
@@ -144,6 +145,8 @@ export default async function BlogPostPage({ params }: Props) {
         )}
 
         <BlogBody content={content} />
+
+        <ShareButtons title={title} />
       </div>
 
       <Footer />

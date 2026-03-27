@@ -21,22 +21,42 @@ export async function GET(
     const raw = resolvedParams.slug;
     const decoded = decodeURIComponent(raw ?? "");
     const slug = normalizeSlug(decoded);
+
+    console.log("RAW:", raw);
+    console.log("DECODED:", decoded);
+    console.log("FINAL SLUG:", slug);
+
     if (!slug) throw new ApiError(400, "Invalid slug");
 
     await connectDB();
 
-    const doc = await Blog.findOne({ slug, published: true })
+    let doc = await Blog.findOne({ slug, published: true })
       .populate("author", "name email")
       .lean();
 
-    if (!doc) throw new ApiError(404, "Not found");
+    // Optional safe fallback: If not found by slug, try by ID if it's a valid ObjectId
+    if (!doc && /^[0-9a-fA-F]{24}$/.test(slug)) {
+      doc = await Blog.findById(slug)
+        .populate("author", "name email")
+        .lean();
+    }
+
+    console.log("DOC:", doc);
+
+    if (!doc) {
+      return NextResponse.json({ message: "Not found" }, { status: 404 });
+    }
 
     return NextResponse.json({
       blog: serializeBlog(doc as Parameters<typeof serializeBlog>[0], {
         includeContent: true,
       }),
     });
-  } catch (error) {
-    return handleApiError(error, "GET /api/blogs/:slug");
+  } catch (error: any) {
+    console.error("BLOG FETCH ERROR:", error);
+    return NextResponse.json(
+      { error: String(error), stack: error?.stack },
+      { status: 500 }
+    );
   }
 }

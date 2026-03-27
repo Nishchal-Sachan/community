@@ -27,9 +27,9 @@ function serializeAuthor(author: LeanAuthor): {
 
 export function serializeBlog(
   doc: {
-    _id: unknown;
-    title: string;
-    slug: string;
+    _id?: unknown;
+    title?: string;
+    slug?: string;
     content?: string;
     excerpt?: string;
     coverImage?: string;
@@ -37,23 +37,24 @@ export function serializeBlog(
     tags?: string[];
     author?: LeanAuthor;
     published?: boolean;
-    createdAt?: Date;
-  },
+    createdAt?: Date | string;
+  } | null | undefined,
   opts?: { includeContent?: boolean },
-): Record<string, unknown> {
+): Record<string, unknown> | null {
+  if (!doc) return null;
   const includeContent = opts?.includeContent !== false;
-  const createdAt = doc.createdAt;
+  const createdAt = doc?.createdAt;
   return {
-    id: String(doc._id),
-    title: doc.title,
-    slug: doc.slug,
-    ...(includeContent ? { content: doc.content ?? "" } : {}),
-    excerpt: doc.excerpt ?? "",
-    coverImage: doc.coverImage ?? "",
-    category: doc.category ?? "",
-    tags: Array.isArray(doc.tags) ? doc.tags : [],
-    author: serializeAuthor(doc.author),
-    published: Boolean(doc.published),
+    id: doc?._id != null ? String(doc._id) : "",
+    title: doc?.title ?? "",
+    slug: doc?.slug ?? "",
+    ...(includeContent ? { content: doc?.content ?? "" } : {}),
+    excerpt: doc?.excerpt ?? "",
+    coverImage: doc?.coverImage ?? "",
+    category: doc?.category ?? "",
+    tags: Array.isArray(doc?.tags) ? doc.tags : [],
+    author: serializeAuthor(doc?.author),
+    published: Boolean(doc?.published),
     createdAt:
       createdAt instanceof Date ? createdAt.toISOString() : String(createdAt ?? ""),
   };

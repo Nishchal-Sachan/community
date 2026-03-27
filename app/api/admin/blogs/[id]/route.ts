@@ -111,7 +111,7 @@ export async function PUT(
 
     const explicitSlug = String(body.slug ?? "").trim();
     if (explicitSlug) {
-      const slugBase = explicitSlug.toLowerCase().replace(/\s+/g, "-");
+      const slugBase = slugFromTitle(explicitSlug);
       $set.slug = await ensureUniqueBlogSlug(slugBase.slice(0, 200), id);
     } else if ($set.title !== undefined && !explicitSlug) {
       const nextTitle = String($set.title);

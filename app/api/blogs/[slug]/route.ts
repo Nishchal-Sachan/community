@@ -34,6 +34,13 @@ export async function GET(
       .populate("author", "name email")
       .lean();
 
+    // Optional safe fallback: If old slugs exist and a migration happened
+    if (!doc) {
+      doc = await Blog.findOne({ oldSlug: slug, published: true })
+        .populate("author", "name email")
+        .lean();
+    }
+
     // Optional safe fallback: If not found by slug, try by ID if it's a valid ObjectId
     if (!doc && /^[0-9a-fA-F]{24}$/.test(slug)) {
       doc = await Blog.findById(slug)

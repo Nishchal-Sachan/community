@@ -42,6 +42,7 @@ const UserSchema = new mongoose.Schema(
       default: "none",
       enum: ["none", "active"],
     },
+    isBlogger: { type: Boolean, default: false },
   },
   { timestamps: true }
 );
@@ -69,7 +70,7 @@ const Member = mongoose.models.Member ?? mongoose.model("Member", MemberSchema);
 
 async function main() {
   const TARGET_EMAIL = "sachannishchal@gmail.com";
-  const MEMBER_NAME = "Sachin Nishchal";
+  const MEMBER_NAME = "Nishchal Sachan";
   const MEMBER_PHONE = "+91 1234567890";
   const MEMBER_AREA = "दिल्ली, दिल्ली";
   const MEMBER_CITY = "दिल्ली";
@@ -94,11 +95,12 @@ async function main() {
         membershipStatus: "active",
         "membership.isPaid": true,
         marriageSubscriptionStatus: "active",
+        isBlogger: true,
       },
     }
   );
   console.log(
-    `User "${TARGET_EMAIL}" updated: paid member + marriage portal (premium) active.${wasMember ? " (was already member)" : ""}`
+    `User "${TARGET_EMAIL}" updated: paid member + marriage portal (premium) + Blogger Access active.${wasMember ? " (was already member)" : ""}`
   );
 
   const memberExists = await Member.findOne({ name: MEMBER_NAME, phone: MEMBER_PHONE });
@@ -137,9 +139,10 @@ async function main() {
   }
 
   console.log("\n--- Paid Member Ready ---");
-  console.log(`  Email:    ${TARGET_EMAIL}`);
-  console.log("  Password: (your existing password)");
-  console.log("\nLogin and access full member portal features.");
+  console.log(`  Email:       ${TARGET_EMAIL}`);
+  console.log("  Password:    (your existing password)");
+  console.log("  Permissions: Full Member + Marriage Premium + Blogger");
+  console.log("\nLogin and access full member portal & blogging features.");
 
   await mongoose.disconnect();
 }

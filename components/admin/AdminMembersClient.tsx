@@ -20,6 +20,7 @@ type DetailUser = {
   membershipStatus: string;
   role: string;
   membershipIsPaid?: boolean;
+  isBlogger?: boolean;
   marriageSubscriptionStatus?: string;
   createdAt?: string;
 };
@@ -162,6 +163,10 @@ function UserDetailBody({ data }: { data: UserDetailPayload }) {
           valueBold={false}
         />
         <Field
+          label="Blogger Access"
+          value={user.isBlogger ? <span className="text-green-600 font-semibold">Active</span> : "Inactive"}
+        />
+        <Field
           label="Marriage Subscription"
           value={marriageSubscriptionLabel(user.marriageSubscriptionStatus)}
         />
@@ -217,7 +222,7 @@ export default function AdminMembersClient() {
     void load();
   }, [load]);
 
-  async function patch(id: string, action: "approve" | "reject" | "remove_directory") {
+  async function patch(id: string, action: "approve" | "reject" | "remove_directory" | "toggle_blogger") {
     setBusy(`${id}-${action}`);
     try {
       const res = await fetch(`/api/admin/users/${id}`, {
@@ -231,6 +236,17 @@ export default function AdminMembersClient() {
         throw new Error(j.error ?? "Failed");
       }
       await load();
+      
+      if (action === "toggle_blogger" && detail && !("error" in detail) && detail.user.id === id) {
+        setDetail((prev) => {
+          if (!prev || "error" in prev) return prev;
+          return {
+            ...prev,
+            user: { ...prev.user, isBlogger: !prev.user.isBlogger }
+          };
+        });
+      }
+      
     } catch (e) {
       alert(e instanceof Error ? e.message : "Error");
     } finally {
@@ -369,28 +385,34 @@ export default function AdminMembersClient() {
                     id="member-details-title"
                     className="truncate text-lg font-semibold tracking-tight text-gray-900"
                   >
-                    {!detail
-                      ? "Loading…"
-                      : "error" in detail
-                        ? "Unable to load"
-                        : String(detail.user.name ?? "").trim() || "—"}
+                    {!detail || "error" in detail ? "—" : String(detail.user.name ?? "").trim()}
                   </h2>
                   <p className="truncate text-sm text-gray-500">
-                    {!detail
-                      ? "\u00a0"
-                      : "error" in detail
-                        ? "Try again or close"
-                        : String(detail.user.email ?? "").trim() || "—"}
+                    {!detail || "error" in detail ? "—" : String(detail.user.email ?? "").trim()}
                   </p>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => setDetailId(null)}
-                className="shrink-0 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
-              >
-                Close
-              </button>
+              
+              <div className="flex gap-2">
+                {!detail || "error" in detail ? null : (
+                  <button
+                    type="button"
+                    onClick={() => void patch(detail.user.id, "toggle_blogger")}
+                    disabled={!!busy}
+                    className="shrink-0 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+                  >
+                    {busy === `${detail.user.id}-toggle_blogger` ? "..." : detail.user.isBlogger ? "Remove Blogger" : "Make Blogger"}
+                  </button>
+                )}
+                
+                <button
+                  type="button"
+                  onClick={() => setDetailId(null)}
+                  className="shrink-0 rounded-md border border-gray-200 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400"
+                >
+                  Close
+                </button>
+              </div>
             </header>
             <div className="max-h-[calc(90vh-4.25rem)] overflow-y-auto px-5 py-5">
               {!detail ? (

@@ -1,14 +1,18 @@
 "use client";
 
+import { JoinMembershipForm } from "@/app/join/_components/JoinMembershipForm";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
-import { JoinMembershipForm } from "@/app/join/_components/JoinMembershipForm";
 
 interface MembersPortalContentProps {
   isMember: boolean;
+  isBlogger?: boolean;
 }
 
-export function MembersPortalContent({ isMember }: MembersPortalContentProps) {
+export function MembersPortalContent({
+  isMember,
+  isBlogger,
+}: MembersPortalContentProps) {
   const [showForm, setShowForm] = useState(false);
   const [formLoading, setFormLoading] = useState(false);
 
@@ -22,7 +26,34 @@ export function MembersPortalContent({ isMember }: MembersPortalContentProps) {
   }, [showForm]);
 
   if (isMember) {
-    return null;
+    return (
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="flex flex-wrap items-center gap-3">
+          {isBlogger ? (
+            <a
+              href="/members/create-blog"
+              className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-[#F57C00] bg-[#F57C00] px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-[#E65100] focus:outline-none focus:ring-2 focus:ring-[#F57C00] focus:ring-offset-2"
+            >
+              ब्लॉग लिखें
+            </a>
+          ) : (
+            <div className="group relative">
+              <button
+                type="button"
+                disabled
+                onClick={() => alert("आपको ब्लॉग लिखने की अनुमति नहीं है")}
+                className="inline-flex min-h-[44px] items-center justify-center rounded-lg border border-gray-300 bg-gray-100 px-5 py-3 text-sm font-medium text-gray-500 cursor-not-allowed"
+              >
+                ब्लॉग लिखें
+              </button>
+              <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none">
+                आपको ब्लॉग लिखने की अनुमति नहीं है
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   }
 
   const modalContent = showForm && (
@@ -44,51 +75,65 @@ export function MembersPortalContent({ isMember }: MembersPortalContentProps) {
         className="flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-            {/* Sticky header */}
-            <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
-              <h2 id="membership-form-title" className="font-heading text-xl font-semibold text-gray-900">
-                सदस्यता आवेदन फॉर्म
-              </h2>
-              <button
-                type="button"
-                onClick={() => setShowForm(false)}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-                aria-label="बंद करें"
-              >
-                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+        {/* Sticky header */}
+        <div className="flex shrink-0 items-center justify-between border-b border-gray-200 bg-white px-6 py-4">
+          <h2
+            id="membership-form-title"
+            className="font-heading text-xl font-semibold text-gray-900"
+          >
+            सदस्यता आवेदन फॉर्म
+          </h2>
+          <button
+            type="button"
+            onClick={() => setShowForm(false)}
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+            aria-label="बंद करें"
+          >
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
 
-            {/* Scrollable body */}
-            <div className="flex-1 overflow-y-auto overscroll-contain">
-              <div className="px-6 py-5">
-                <p className="mb-6 font-body text-sm text-gray-600">
-                  समाज का हिस्सा बनने के लिए सदस्यता लें। फॉर्म भरकर भुगतान चरण पर जाएं।
-                </p>
-                <JoinMembershipForm
-                  formId="membership-form"
-                  submitInFooter
-                  onSuccess={() => setShowForm(false)}
-                  onLoadingChange={setFormLoading}
-                />
-              </div>
-            </div>
-
-            {/* Sticky footer */}
-            <div className="shrink-0 border-t border-gray-200 bg-gray-50 px-6 py-4">
-              <button
-                type="submit"
-                form="membership-form"
-                disabled={formLoading}
-                className="w-full rounded-lg bg-[#F57C00] py-3.5 font-body font-medium text-white transition-colors hover:bg-[#E65100] focus:outline-none focus:ring-2 focus:ring-[#F57C00] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {formLoading ? "सेव हो रहा है..." : "आवेदन जमा करें"}
-              </button>
-            </div>
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto overscroll-contain">
+          <div className="px-6 py-5">
+            <p className="mb-6 font-body text-sm text-gray-600">
+              समाज का हिस्सा बनने के लिए सदस्यता लें। फॉर्म भरकर भुगतान चरण पर
+              जाएं।
+            </p>
+            <JoinMembershipForm
+              formId="membership-form"
+              submitInFooter
+              onSuccess={() => setShowForm(false)}
+              onLoadingChange={setFormLoading}
+            />
           </div>
         </div>
+
+        {/* Sticky footer */}
+        <div className="shrink-0 border-t border-gray-200 bg-gray-50 px-6 py-4">
+          <button
+            type="submit"
+            form="membership-form"
+            disabled={formLoading}
+            className="w-full rounded-lg bg-[#F57C00] py-3.5 font-body font-medium text-white transition-colors hover:bg-[#E65100] focus:outline-none focus:ring-2 focus:ring-[#F57C00] focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-70"
+          >
+            {formLoading ? "सेव हो रहा है..." : "आवेदन जमा करें"}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 
   return (

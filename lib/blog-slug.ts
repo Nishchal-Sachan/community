@@ -1,17 +1,27 @@
 import Blog from "@/lib/models/Blog";
+import slugify from "slugify";
+import { transliterate } from "transliteration";
 
-/** `title.toLowerCase().replace(/\s+/g, "-")` per product spec. */
+/** Generate safe ascii slug using slugify and transliterate fallback */
 export function slugFromTitle(title: string): string {
-  const cleaned = title
-    .trim()
-    .toLowerCase()
-    .normalize("NFKD") // 🔥 important for unicode stability
-    .replace(/[^\p{L}\p{M}\p{N}\s]/gu, "") // keep spaces SAFE
-    .replace(/\s+/g, "-") // convert spaces → dash
-    .replace(/-+/g, "-")
-    .replace(/^-+|-+$/g, "");
+  // 1. Convert unicode/Hindi into approximate Latin ASCII characters
+  const asciiTitle = transliterate(title);
 
-  return cleaned || "post";
+  // 2. Slugify it enforcing strict ASCII lowercase rules
+  const cleaned = slugify(asciiTitle, {
+    replacement: "-",     // replace spaces with replacement character
+    remove: /[^a-zA-Z0-9\s-]/g, // remove characters that match regex
+    lower: true,          // convert to lower case
+    strict: true,         // strip special characters except replacement
+    trim: true,           // trim leading and trailing replacement chars
+  });
+
+  // 3. Ensure fallback if totally empty
+  if (!cleaned) {
+    return "post-" + Date.now();
+  }
+
+  return cleaned;
 }
 
 /** Ensures a unique slug in Blog (appends `-1`, `-2`, … if needed). Max length respects schema. */

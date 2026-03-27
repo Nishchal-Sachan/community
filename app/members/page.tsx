@@ -7,6 +7,8 @@ import { Container } from "@/components/ui/Container";
 import { getAppBaseUrl } from "@/lib/get-app-base-url";
 import { getUserFromCookie } from "@/lib/user-auth";
 import { hasFullMemberAccess } from "@/lib/member-access";
+import { connectDB } from "@/lib/db";
+import User from "@/lib/models/User";
 import { MembersPortalContent } from "./_components/MembersPortalContent";
 import { MembersFilters } from "./_components/MembersFilters";
 
@@ -215,6 +217,13 @@ export default async function MembersPage({
   const payload = await getUserFromCookie();
   const isMember = await hasFullMemberAccess(payload);
 
+  let isBlogger = false;
+  if (payload?.userId) {
+    await connectDB();
+    const u = await User.findById(payload.userId).lean();
+    isBlogger = Boolean(u?.isBlogger);
+  }
+
   return (
     <main className="min-h-screen overflow-x-hidden bg-gray-50">
       <Container className="flex flex-col gap-8 py-16">
@@ -225,7 +234,7 @@ export default async function MembersPage({
               सार्वजनिक सदस्य निर्देशिका
             </p>
           </div>
-          <MembersPortalContent isMember={isMember} />
+          <MembersPortalContent isMember={isMember} isBlogger={isBlogger} />
         </div>
 
         <Suspense

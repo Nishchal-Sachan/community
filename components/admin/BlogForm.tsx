@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
+import slugify from "slugify";
+import { transliterate } from "transliteration";
 
 export type BlogFormInitial = {
   title: string;
@@ -31,9 +33,12 @@ type Props = {
   mode: "create" | "edit";
   blogId?: string;
   initial?: BlogFormInitial;
+  submitUrl?: string;
+  redirectUrl?: string;
+  uploadUrl?: string;
 };
 
-export default function BlogForm({ mode, blogId, initial }: Props) {
+export default function BlogForm({ mode, blogId, initial, submitUrl = "/api/admin/blogs", redirectUrl = "/admin/blogs", uploadUrl = "/api/admin/blogs/upload" }: Props) {
   const router = useRouter();
   const [title, setTitle] = useState(initial?.title ?? "");
   const [content, setContent] = useState(initial?.content ?? "");
@@ -59,7 +64,7 @@ export default function BlogForm({ mode, blogId, initial }: Props) {
     try {
       const fd = new FormData();
       fd.append("file", file);
-      const res = await fetch("/api/admin/blogs/upload", {
+      const res = await fetch(uploadUrl, {
         method: "POST",
         body: fd,
         credentials: "include",
@@ -102,7 +107,7 @@ export default function BlogForm({ mode, blogId, initial }: Props) {
 
     try {
       if (mode === "create") {
-        const res = await fetch("/api/admin/blogs", {
+        const res = await fetch(submitUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           credentials: "include",
@@ -110,7 +115,7 @@ export default function BlogForm({ mode, blogId, initial }: Props) {
         });
         const j = (await res.json()) as { error?: string };
         if (!res.ok) throw new Error(j.error ?? "Save failed");
-        router.push("/admin/blogs");
+        router.push(redirectUrl);
         router.refresh();
         return;
       }
@@ -178,6 +183,11 @@ export default function BlogForm({ mode, blogId, initial }: Props) {
           required
           maxLength={300}
         />
+        {mode === "create" && title && (
+          <p className="mt-1 font-mono text-xs text-green-700">
+            Preview URL: /blog/{slugify(transliterate(title), { replacement: "-", remove: /[^a-zA-Z0-9\s-]/g, lower: true, strict: true, trim: true }) || "post-..."}
+          </p>
+        )}
       </div>
 
       <div>
@@ -292,7 +302,7 @@ export default function BlogForm({ mode, blogId, initial }: Props) {
           {saving ? "Saving…" : mode === "create" ? "Create post" : "Save changes"}
         </button>
         <Link
-          href="/admin/blogs"
+          href={redirectUrl}
           className="inline-flex items-center border border-gray-300 bg-white px-4 py-2 text-sm hover:bg-gray-50"
         >
           Cancel

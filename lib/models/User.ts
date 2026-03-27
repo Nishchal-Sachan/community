@@ -16,6 +16,7 @@ export interface IUser extends Document {
   membershipStatus: UserMembershipStatus;
   marriageSubscriptionStatus: MarriageSubscriptionStatus;
   membership: IUserMembership;
+  isBlogger: boolean;
   comparePassword(candidate: string): Promise<boolean>;
 }
 
@@ -58,6 +59,10 @@ const UserSchema = new Schema<IUser>(
     },
     membership: {
       isPaid: { type: Boolean, default: false },
+    },
+    isBlogger: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

@@ -46,6 +46,7 @@ export async function GET(
         membershipStatus: user.membershipStatus,
         role: user.role,
         membershipIsPaid: Boolean(u.membership?.isPaid),
+        isBlogger: Boolean(user.isBlogger),
         marriageSubscriptionStatus: u.marriageSubscriptionStatus,
         createdAt: u.createdAt,
       },
@@ -81,7 +82,7 @@ export async function PATCH(
 
     const body = await parseBody(req);
     const action = body?.action as string;
-    if (!["approve", "reject", "remove_directory"].includes(action)) {
+    if (!["approve", "reject", "remove_directory", "toggle_blogger"].includes(action)) {
       throw new ApiError(400, "Invalid action");
     }
 
@@ -113,6 +114,10 @@ export async function PATCH(
           role: "user",
           "membership.isPaid": false,
         },
+      });
+    } else if (action === "toggle_blogger") {
+      await User.findByIdAndUpdate(id, {
+        $set: { isBlogger: !user.isBlogger },
       });
     } else {
       await Member.deleteMany({ userId: new mongoose.Types.ObjectId(id) });

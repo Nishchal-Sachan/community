@@ -14,10 +14,11 @@ function normalizeSlug(slug: string) {
 }
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { slug: string } },
+  { params }: { params: Promise<{ slug: string }> },
 ) {
   try {
-    const raw = params.slug;
+    const resolvedParams = await params;
+    const raw = resolvedParams.slug;
     const decoded = decodeURIComponent(raw ?? "");
     const slug = normalizeSlug(decoded);
     if (!slug) throw new ApiError(400, "Invalid slug");

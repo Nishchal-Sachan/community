@@ -8,12 +8,29 @@ import {
 } from "@/lib/user-auth";
 import { ApiError, handleApiError, parseBody } from "@/lib/api-error";
 import { resolveMembershipStatus } from "@/lib/member-access";
+import { rateLimit, getClientIp, LOGIN_RATE_LIMIT } from "@/lib/rate-limit";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // POST /api/auth/user/login
 export async function POST(req: NextRequest) {
   try {
+    // ── Rate limiting ──────────────────────────────────────────────────────
+    const ip = getClientIp(req);
+    const rl = rateLimit(
+      `user-login:${ip}`,
+      LOGIN_RATE_LIMIT.limit,
+      LOGIN_RATE_LIMIT.windowMs
+    );
+
+    if (!rl.allowed) {
+      const minutes = Math.ceil(rl.retryAfter / 60);
+      return NextResponse.json(
+        { error: `Too many login attempts. Try again in ${minutes} minute${minutes !== 1 ? "s" : ""}.` },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
+      );
+    }
+
     const body = await parseBody(req);
     if (!body) throw new ApiError(400, "Invalid JSON body");
 

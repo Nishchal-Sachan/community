@@ -2,12 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import User from "@/lib/models/User";
 import { ApiError, handleApiError, parseBody } from "@/lib/api-error";
+import { rateLimit, getClientIp } from "@/lib/rate-limit";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 // POST /api/auth/register
 export async function POST(req: NextRequest) {
   try {
+    // ── Rate limiting ──────────────────────────────────────────────────────
+    // Allow 3 registrations per IP per hour
+    const ip = getClientIp(req);
+    const rl = rateLimit(`register:${ip}`, 3, 3600); 
+
+    if (!rl.allowed) {
+      const minutes = Math.ceil(rl.retryAfter / 60);
+      return NextResponse.json(
+        { error: `Too many registration attempts. Try again in ${minutes} minute${minutes !== 1 ? "s" : ""}.` },
+        { status: 429, headers: { "Retry-After": String(rl.retryAfter) } }
+      );
+    }
+
     const body = await parseBody(req);
     if (!body) throw new ApiError(400, "Invalid JSON body");
 

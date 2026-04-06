@@ -59,11 +59,7 @@ export async function GET(
         includeContent: true,
       }),
     });
-  } catch (error: any) {
-    console.error("BLOG FETCH ERROR:", error);
-    return NextResponse.json(
-      { error: String(error), stack: error?.stack },
-      { status: 500 }
-    );
+  } catch (error) {
+    return handleApiError(error, "GET /api/blogs/:slug");
   }
 }

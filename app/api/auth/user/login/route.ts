@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
       throw new ApiError(401, "Invalid credentials");
     }
 
-    const token = signUserToken({
+    const token = await signUserToken({
       userId: user._id.toString(),
       email: user.email,
       role: user.role,

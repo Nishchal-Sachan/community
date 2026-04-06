@@ -220,7 +220,7 @@ export async function POST(req: NextRequest) {
       methodRaw: paymentEntity.method,
     });
 
-    const token = signUserToken({
+    const token = await signUserToken({
       userId: user._id.toString(),
       email: user.email,
       role: user.role,

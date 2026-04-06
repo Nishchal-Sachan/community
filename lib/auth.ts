@@ -1,29 +1,25 @@
-import jwt from "jsonwebtoken";
+import { EncryptJWT, jwtDecrypt } from "jose";
 import { cookies } from "next/headers";
 import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET is not set. Add it to .env or .env.local (see .env.example).");
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+  throw new Error("JWT_SECRET must be at least 32 characters for encryption.");
 }
 
-export const COOKIE_NAME = "admin_token";
-const TOKEN_EXPIRY = "7d";
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days in seconds
+const secret = new TextEncoder().encode(JWT_SECRET);
+
+export const COOKIE_NAME = "__adm_secure_sid"; // Obscured name
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 
 // ─── Cookie Options ───────────────────────────────────────────────────────────
 
-/**
- * Returns secure, consistent cookie options for the admin JWT.
- * sameSite: "strict" — no cross-site transmission, maximising CSRF protection.
- * secure — enforced in production; omitted in dev so http://localhost works.
- */
 export function getCookieOptions(maxAge: number = COOKIE_MAX_AGE): Partial<ResponseCookie> {
   return {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict", // Switched from 'lax' to 'strict' for better CSRF protection
+    secure: process.env.NODE_ENV === "production", // true in production
+    sameSite: "strict",
     path: "/",
     maxAge,
   };
@@ -34,28 +30,34 @@ export function getCookieOptions(maxAge: number = COOKIE_MAX_AGE): Partial<Respo
 export interface AdminTokenPayload {
   adminId: string;
   email: string;
+  iat?: number;
 }
 
-// ─── JWT Utilities ────────────────────────────────────────────────────────────
+// ─── JWT Utilities (JWE - Encrypted) ──────────────────────────────────────────
 
-/** Signs a JWT and returns the token string. */
-export function signToken(payload: AdminTokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+/** Encrypts a payload into a JWE. */
+export async function signToken(payload: AdminTokenPayload): Promise<string> {
+  return await new EncryptJWT({ ...payload })
+    .setProtectedHeader({ alg: "dir", enc: "A256GCM" })
+    .setIssuedAt()
+    .setExpirationTime("7d")
+    .encrypt(secret);
 }
 
-/** Verifies a JWT string and returns the decoded payload, or null if invalid/expired. */
-export function verifyToken(token: string): AdminTokenPayload | null {
+/** Decrypts a JWE and returns the payload. */
+export async function verifyToken(token: string): Promise<AdminTokenPayload | null> {
   try {
-    return jwt.verify(token, JWT_SECRET) as AdminTokenPayload;
-  } catch {
+    const { payload } = await jwtDecrypt(token, secret);
+    return payload as unknown as AdminTokenPayload;
+  } catch (err) {
     return null;
   }
 }
 
-/** Reads and verifies the admin token from the incoming request cookies (Server Components / Route Handlers). */
+/** Reads and verifies the admin token from cookies. */
 export async function getAdminFromCookie(): Promise<AdminTokenPayload | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(COOKIE_NAME)?.value;
   if (!token) return null;
-  return verifyToken(token);
+  return await verifyToken(token);
 }

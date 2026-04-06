@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyTokenEdge } from "@/lib/auth-edge";
 import { verifyUserTokenEdge, USER_COOKIE_NAME } from "@/lib/user-auth-edge";
-
-const ADMIN_COOKIE_NAME = "admin_token";
+import { COOKIE_NAME as ADMIN_COOKIE_NAME } from "@/lib/auth";
 
 // ─── Route config (extend here to add/modify protection) ─────────────────────
 

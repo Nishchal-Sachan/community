@@ -82,8 +82,8 @@ export async function POST(req: NextRequest) {
       throw new ApiError(401, "Invalid credentials");
     }
 
-    // ── Issue JWT cookie and redirect ───────────────────────────────────────
-    const token = signToken({ adminId: admin._id.toString(), email: admin.email });
+    // ── Issue JWE cookie and redirect ───────────────────────────────────────
+    const token = await signToken({ adminId: admin._id.toString(), email: admin.email });
 
     const target = redirectTo ?? "/admin";
     const safeRedirect = target.startsWith("/") && !target.startsWith("//") ? target : "/admin";

@@ -1,13 +1,10 @@
-/**
- * Edge-compatible JWT verification for user auth in the Next.js `proxy`.
- */
-import { jwtVerify } from "jose";
+import { jwtDecrypt } from "jose";
 
-export const USER_COOKIE_NAME = "auth_token";
+export const USER_COOKIE_NAME = "__session_id";
 
 const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET must be defined");
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+  throw new Error("JWT_SECRET must be at least 32 chars");
 }
 
 export interface UserTokenPayload {
@@ -19,12 +16,12 @@ export interface UserTokenPayload {
 export async function verifyUserTokenEdge(token: string): Promise<UserTokenPayload | null> {
   try {
     const secret = new TextEncoder().encode(JWT_SECRET);
-    const { payload } = await jwtVerify(token, secret);
+    const { payload } = await jwtDecrypt(token, secret);
     const userId = payload.userId as string | undefined;
     const email = payload.email as string | undefined;
     const role = payload.role as string | undefined;
     if (!userId || !email) return null;
-    return { userId, email, role };
+    return { userId, email, role } as UserTokenPayload;
   } catch {
     return null;
   }

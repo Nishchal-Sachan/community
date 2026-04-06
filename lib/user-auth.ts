@@ -1,22 +1,17 @@
-import jwt from "jsonwebtoken";
+import { EncryptJWT, jwtDecrypt } from "jose";
 import { cookies } from "next/headers";
 import type { ResponseCookie } from "next/dist/compiled/@edge-runtime/cookies";
 
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET must be defined in environment");
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+  throw new Error("JWT_SECRET must be at least 32 chars");
 }
 
-export const USER_COOKIE_NAME = "auth_token";
-const TOKEN_EXPIRY = "7d";
-const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+const secret = new TextEncoder().encode(JWT_SECRET);
 
-export interface UserTokenPayload {
-  userId: string;
-  email: string;
-  role?: string;
-}
+export const USER_COOKIE_NAME = "__session_id"; // Obscured
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; 
 
 export function getUserCookieOptions(maxAge: number = COOKIE_MAX_AGE): Partial<ResponseCookie> {
   return {
@@ -28,13 +23,27 @@ export function getUserCookieOptions(maxAge: number = COOKIE_MAX_AGE): Partial<R
   };
 }
 
-export function signUserToken(payload: UserTokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
+export interface UserTokenPayload {
+  userId: string;
+  email: string;
+  role?: string;
+  iat?: number;
 }
 
-export function verifyUserToken(token: string): UserTokenPayload | null {
+/** Signs a JWE. */
+export async function signUserToken(payload: UserTokenPayload): Promise<string> {
+  return await new EncryptJWT({ ...payload })
+    .setProtectedHeader({ alg: "dir", enc: "A256GCM" })
+    .setIssuedAt()
+    .setExpirationTime("7d")
+    .encrypt(secret);
+}
+
+/** Decrypts a JWE. */
+export async function verifyUserToken(token: string): Promise<UserTokenPayload | null> {
   try {
-    return jwt.verify(token, JWT_SECRET) as UserTokenPayload;
+    const { payload } = await jwtDecrypt(token, secret);
+    return payload as unknown as UserTokenPayload;
   } catch {
     return null;
   }
@@ -44,5 +53,5 @@ export async function getUserFromCookie(): Promise<UserTokenPayload | null> {
   const cookieStore = await cookies();
   const token = cookieStore.get(USER_COOKIE_NAME)?.value;
   if (!token) return null;
-  return verifyUserToken(token);
+  return await verifyUserToken(token);
 }

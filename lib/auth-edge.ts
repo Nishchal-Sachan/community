@@ -8,7 +8,7 @@ if (!JWT_SECRET || JWT_SECRET.length < 32) {
 const getEncryptionKey = async () => {
   const encoder = new TextEncoder();
   const data = encoder.encode(JWT_SECRET);
-  const hash = await crypto.subtle.digest("SHA-256", data);
+  const hash = await globalThis.crypto.subtle.digest("SHA-256", data);
   return new Uint8Array(hash);
 };
 

@@ -7,6 +7,13 @@ if (!JWT_SECRET || JWT_SECRET.length < 32) {
   throw new Error("JWT_SECRET must be at least 32 chars");
 }
 
+const getEncryptionKey = async () => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(JWT_SECRET);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return new Uint8Array(hash);
+};
+
 export interface UserTokenPayload {
   userId: string;
   email: string;
@@ -15,7 +22,7 @@ export interface UserTokenPayload {
 
 export async function verifyUserTokenEdge(token: string): Promise<UserTokenPayload | null> {
   try {
-    const secret = new TextEncoder().encode(JWT_SECRET);
+    const secret = await getEncryptionKey();
     const { payload } = await jwtDecrypt(token, secret);
     const userId = payload.userId as string | undefined;
     const email = payload.email as string | undefined;
